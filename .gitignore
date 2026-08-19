@@ -1,0 +1,27 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node
+node_modules/
+
+# Env / secrets
+.env
+*.env.local
+
+# Data & outputs
+data/*.csv
+data/*.parquet
+analysis/figures/*.png
+!data/README.md
+!analysis/figures/README.md
