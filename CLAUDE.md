@@ -1,1 +1,1 @@
-_Placeholder — Claude-specific instructions to be added._
+All agent instructions for this repository live in AGENTS.md — read that file. 
