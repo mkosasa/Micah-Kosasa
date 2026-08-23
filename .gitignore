@@ -1,10 +1,6 @@
 # Microsoft Office lock and temporary files
 # Created while a workbook/document is open; safe to ignore, never the actual content.
-~$*.xlsx
-~$*.xls
-~$*.xlsm
-~$*.docx
-~$*.doc
+~$*
 .~lock.*#
 
 # macOS metadata files
