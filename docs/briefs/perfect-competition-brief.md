@@ -1,1 +1,3 @@
 In this hypothetical scenario my farm can potentially grow three different types of crops but there are limitations and constraints on costs, labor, price and beds. I need to determine the optimum combination of what to grow within the constraints to maximize profits. My hypothesis is that 20 tomato plots and 30 mesclun plots and 14 carrot plots is the correct combination to maximize profits using the perfect competition model.
+
+Micah
