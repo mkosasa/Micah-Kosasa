@@ -1,27 +1,40 @@
-# OS
-.DS_Store
-Thumbs.db
+# Microsoft Office lock and temporary files
+# Created while a workbook/document is open; safe to ignore, never the actual content.
+~$*
+.~lock.*#
 
-# Editors
+# macOS metadata files
+# Finder/Spotlight bookkeeping that has nothing to do with repo content.
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows metadata and shortcut files
+# Explorer/thumbnail cache and folder-config artifacts.
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Editor and IDE backup/swap files
+# Autosave and temp files from common editors on either OS.
+*~
+*.swp
+*.swo
+*.bak
+*.tmp
 .vscode/
 .idea/
 
-# Python
-__pycache__/
-*.pyc
-.venv/
-venv/
-
-# Node
-node_modules/
-
-# Env / secrets
+# Credentials and environment files
+# Anything likely to hold secrets, API keys, or local config that shouldn't be public.
 .env
-*.env.local
-
-# Data & outputs
-data/*.csv
-data/*.parquet
-analysis/figures/*.png
-!data/README.md
-!analysis/figures/README.md
+.env.*
+*.pem
+*.key
+credentials.json
+secrets.yml
+secrets.yaml
