@@ -21,6 +21,17 @@ started: 2026-08-23
 | 2026-08-23 | Claude (web) | Noted that as PFC Vice-Chair I drafted the budget for student programs | Budget line attributed to the PFC Vice-Chair role specifically | Kept the correction |
 | 2026-08-23 | Claude (web) | Replace "drafted" with "allocated $5.6 million to over 180 programs, departments and contracted services" | Achievement line updated with the allocation figure | Kept as written |
 | 2026-08-23 | Claude (web) | Noted ASUO section shouldn't outweigh current career info; asked to simplify ASUO and beef up career section instead | ASUO trimmed to one line; career section expanded with team size and network scope | Kept the rebalanced version as the near-final draft |
+| 2026-08-23 | Claude (web) | Build a 1-page resume from my existing Drive resumes, using a given Penn-style markdown skeleton | Full resume mapped into the skeleton's Education/Experience/Leadership/Honors/Skills sections | Used as the first draft |
+| 2026-08-23 | Claude (web) | Add my CHRC certification and always include it going forward | CHRC added to the name line and Honors section; standing preference saved | Kept both; preference now applies to future documents |
+| 2026-08-23 | Claude (web) | Add DPH State Convention Vice-Chair role, sourced from articles and the Cvent event page | Bullet with convention theme, venue, and delegate count | Kept initially, later shortened during page trimming |
+| 2026-08-23 | Claude (web) | Reformat to match a specific GitHub template's raw markdown structure, copy-paste ready | Resume restructured to match the template's headers/spacing exactly | Adopted as the standing format |
+| 2026-08-23 | Claude (web) | Add my Privacy Coordinator role; move Laulima Data Alliance into Professional Experience | Privacy Coordinator entry added with bullets; Laulima moved out of Honors into Experience | Kept both changes, bullets trimmed later |
+| 2026-08-23 | Claude (web) | Give trim options before cutting bullets for length; confirmed cutting the DPH Executive Director hiring bullet | List of trim candidates across all sections | Used list to guide subsequent trim decisions |
+| 2026-08-23 | Claude (web) | Cut the Privacy Coordinator audits bullet and the ASUO $5.6M bullet | Both bullets removed | Kept |
+| 2026-08-23 | Claude (web) | Check whether the resume was actually one page | Rendered to PDF; confirmed it was still 2 pages, identified exact overflow content | Used findings to target further trims |
+| 2026-08-23 | Claude (web) | Reduce Privacy Coordinator to title and years only, no bullets | Entry trimmed; re-checked page count (still 2 pages) | Kept |
+| 2026-08-23 | Claude (web) | Trim the ASUO bullet and DPH convention bullet; remove the Laulima "collaborates with stakeholders" bullet | Three bullets shortened or removed; near-one-page result confirmed | Kept as final content; remaining gap left to formatting, not further cuts |
+| 2026-08-23 | Claude (web) | Finalize and prepare the resume for posting on GitHub | Final RESUME.md delivered in template-matching raw markdown | Delivered as the finished file |
 
 ## Errors caught
 - 2026-08-23 — none identified; all factual claims (Queen's size/scope, official org names) were verified via web search before inclusion.
