@@ -1,1 +1,1 @@
-See [AGENTS.md](AGENTS.md) for AI conventions in this repository.
+All agent instructions for this repository live in AGENTS.md — read that file. 
