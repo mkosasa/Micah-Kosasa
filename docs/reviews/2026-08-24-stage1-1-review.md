@@ -6,7 +6,7 @@
 | Criterion | Earned | Notes |
 |---|---|---|
 | Problem restated in your own voice | 29 / 30 | Strong and clearly yours. You write it in the first person as the operator, separate what is fixed from what you choose, and name the consequence of getting it wrong in terms of committed labor hours rather than vague lost profit. The assumptions section is better still: singling out the diminishing-returns rates as "the least directly observable of the spec inputs" and the ones the mix is most sensitive to is a genuinely good instinct about where the model's fragility lives. |
-| Hypothesis names a specific mix | 25 / 25 | 20 tomato / 30 mesclun / 14 carrot, in the frontmatter and the body. Unambiguous. |
+| Hypothesis names a specific mix | 25 / 25 | You name 20 tomato / 30 mesclun / 14 carrot, in your frontmatter and again in the body. Unambiguous. |
 | Economic mechanism | 17 / 25 | This is where the points went, and it is worth being precise about why. Your reasoning is a ranking argument: plant the best-margin crop to its cap first, then fill with the next, then let the last take the leftovers. That is a sound way to allocate a fixed resource when cost per unit is constant — but in this case cost per bed is not constant, and the whole point of the diminishing-returns rates is that the tomato you plant twentieth costs far more than the one you plant first. Your own assumptions section names those rates as the thing you would most want to test, and then the hypothesis does not use them. Two factual slips point the same way: mesclun's fertilizer is $880 per bed, the same as tomatoes and twice carrots' $440, so "mesclun's lower fertilizer and labor cost per bed" has it backwards — carrots are the cheap crop on fertilizer. |
 | Falsifiability and process | 13 / 20 | You have the section, and you were admirably honest inside it: "This guess is not derived from marginal analysis or a solver — it's my starting intuition ahead of running the model." I would rather read that than a dressed-up rationalization. But the falsification test itself is circular — "I'd be proved wrong if solving the model returns a different optimal bed allocation" is true of every hypothesis ever written, so it does not discriminate between being slightly off and being wrong about the mechanism. Brief committed 2026-08-23 at 02:34, spec at 03:56. Correct order, correct path. |
 | **Final** | **84 / 100** | earned on merit |
@@ -21,7 +21,7 @@
 
 ### One thing worth saying
 
-Writing "this is my starting intuition, not a derived answer" in a graded document takes some nerve, and it is the right call. A brief that is honestly wrong is worth more in Stage 3 than one that hedges until it cannot be wrong. Keep the honesty and add the arithmetic.
+Writing "this is my starting intuition, not a derived answer" in a graded document takes some nerve, and you were right to do it. A brief that is honestly wrong is worth more in Stage 3 than one that hedges until it cannot be wrong. Keep the honesty and add the arithmetic.
 
 ### Looking ahead to Stage 2 and 3
 
