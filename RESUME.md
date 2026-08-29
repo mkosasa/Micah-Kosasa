@@ -1,7 +1,6 @@
 # Micah Kosasa, CHC, CHPC, CHRC
 
-**Email:** <mkosasa@gmail.com> · (808) 258-3735  
-**Address:** 45-665 Anoi Rd., Kaneohe, HI 96744
+*Contact information available upon request.*
 
 ---
 
