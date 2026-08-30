@@ -1,7 +1,7 @@
 # AI conventions
 
 ## About this repository
-One-line description of what this repo is and who owns it.
+This is the guide for any AI agents.
 Canonical file: AGENTS.md. CLAUDE.md points here.
 
 ## Where things are
@@ -63,6 +63,7 @@ tell me rather than committing it.
 Never use or submit my personal information to anyone without my express
 permission. If there is any ambiguity whether permission was provided, ask
 first — it's better to ask than assume.
+No Protected Health Information as defined under HIPAA. Anything coming from my work at Queens can not be included.
 
 ## Mistakes to avoid (append to this list)
 Record errors here as they happen, so the same one does not repeat.
