@@ -48,6 +48,9 @@ Canonical file: AGENTS.md. CLAUDE.md points here.
 ## Documentation
 When work changes, update the document that describes it in the same commit.
 A capability's README names the engagements that exercised it — keep that current.
+Log every AI session in prompt-log.md at the repo root: the date, the tool, what
+I asked, what it produced, and what I did with it. See docs/lifecycle.md for how
+an engagement moves from brief to decision.
 
 ## Scope
 Do the work I asked for. If you notice something worth doing that I did not ask
@@ -55,6 +58,10 @@ for, tell me instead of doing it.
 
 ## Commits
 Descriptive messages: what changed and why. Never "update" or "stuff".
+- Good: "Add farm constraints to marginal-analysis spec"
+- Good: "Freeze perfect-competition brief; hypothesis is 20/30/14 bed mix"
+- Bad: "Update AGENTS.md"  (what changed?)
+- Bad: "fixes"  (fixes what?)
 
 ## Never include
 No credentials, no API keys, no personal data about anyone, no licensed or
