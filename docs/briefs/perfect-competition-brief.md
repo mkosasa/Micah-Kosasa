@@ -4,7 +4,7 @@ engagement: perfect-competition
 capability: marginal-analysis
 date: 2026-09-01
 status: committed
-"10 tomato / 30 mesclun / 20 carrot beds maximizes profit: tomato's 2.50 hrs/wk/bed labor requirement compounds at 10%/bed and outpaces its $8,800 price well before the cap, while mesclun's (1.25 hrs/wk/bed) and carrots' (0.833 hrs/wk/bed) lower labor requirements and shallower compounding (1.25%/bed and 2.5%/bed) let their marginal beds keep paying off out to their caps"
+hypothesis: "10 tomato / 30 mesclun / 20 carrot beds maximizes profit: tomato's 2.50 hrs/wk/bed labor requirement compounds at 10%/bed and outpaces its $8,800 price well before the cap, while mesclun's (1.25 hrs/wk/bed) and carrots' (0.833 hrs/wk/bed) lower labor requirements and shallower compounding (1.25%/bed and 2.5%/bed) let their marginal beds keep paying off out to their caps"
 ---
 
 # Perfect competition — engagement brief
