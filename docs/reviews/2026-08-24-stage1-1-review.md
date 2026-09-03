@@ -1,31 +1,39 @@
 <!-- PR TARGET: https://github.com/mkosasa/Micah-Kosasa | Stage 1.1 (2.5 pts) -->
-# Stage 1.1 review — engagement brief · **84 / 100** (B) · 2.10 / 2.5 pts
+# Stage 1.1 review — engagement brief · **97 / 100** (A+) · 2.43 / 2.5 pts
 
 **Brief:** [`docs/briefs/perfect-competition-brief.md`](https://github.com/mkosasa/Micah-Kosasa/blob/main/docs/briefs/perfect-competition-brief.md)
 
+> Re-graded 2026-09-02 against your revision of this morning. Your previous score was 84. You closed all three things I named, and the third one you closed better than anyone else in the cohort has.
+
 | Criterion | Earned | Notes |
 |---|---|---|
-| Problem restated in your own voice | 29 / 30 | Strong and clearly yours. You write it in the first person as the operator, separate what is fixed from what you choose, and name the consequence of getting it wrong in terms of committed labor hours rather than vague lost profit. The assumptions section is better still: singling out the diminishing-returns rates as "the least directly observable of the spec inputs" and the ones the mix is most sensitive to is a genuinely good instinct about where the model's fragility lives. |
-| Hypothesis names a specific mix | 25 / 25 | You name 20 tomato / 30 mesclun / 14 carrot, in your frontmatter and again in the body. Unambiguous. |
-| Economic mechanism | 17 / 25 | This is where the points went, and it is worth being precise about why. Your reasoning is a ranking argument: plant the best-margin crop to its cap first, then fill with the next, then let the last take the leftovers. That is a sound way to allocate a fixed resource when cost per unit is constant — but in this case cost per bed is not constant, and the whole point of the diminishing-returns rates is that the tomato you plant twentieth costs far more than the one you plant first. Your own assumptions section names those rates as the thing you would most want to test, and then the hypothesis does not use them. Two factual slips point the same way: mesclun's fertilizer is $880 per bed, the same as tomatoes and twice carrots' $440, so "mesclun's lower fertilizer and labor cost per bed" has it backwards — carrots are the cheap crop on fertilizer. |
-| Falsifiability and process | 13 / 20 | You have the section, and you were admirably honest inside it: "This guess is not derived from marginal analysis or a solver — it's my starting intuition ahead of running the model." I would rather read that than a dressed-up rationalization. But the falsification test itself is circular — "I'd be proved wrong if solving the model returns a different optimal bed allocation" is true of every hypothesis ever written, so it does not discriminate between being slightly off and being wrong about the mechanism. Brief committed 2026-08-23 at 02:34, spec at 03:56. Correct order, correct path. |
-| **Final** | **84 / 100** | earned on merit |
+| Problem restated in your own voice | 29 / 30 | Unchanged, and it was already among the best. First person as the operator, fixed separated from chosen, and the consequence of getting it wrong stated in committed labor hours rather than vague lost profit. Singling out the diminishing-returns rates as "the least directly observable of the spec inputs" is still the sharpest instinct about model fragility in this stage. |
+| Hypothesis names a specific mix | 25 / 25 | 10 tomato / 30 mesclun / 20 carrot, in the frontmatter and again in the body. You moved it from 20 / 30 / 14, and you moved it because your own argument told you to, which is the right reason to move a prediction. |
+| Economic mechanism | 24 / 25 | Up from 17, and this is where the score moved. You took the rates you had already named as the important input and actually used them: 1.10 to the twentieth is about 6.7, so the twentieth tomato bed carries roughly 6.7 times the labor of the first against a price that cannot move, while carrots over the same span reach about 1.64. Putting those two multipliers next to each other is the argument, and it replaces the ranking argument entirely. You also corrected the fertilizer claim explicitly rather than quietly — "Mesclun's fertilizer cost is $880/bed — the same as tomatoes, not lower" — and then rebuilt the conclusion that had been leaning on it. The last point is that you say the crossover "is what the model needs to solve for" without estimating where you think it falls; a guess would have been worth more than the deferral. |
+| Falsifiability and process | 19 / 20 | Up from 13. The circular test is gone and three discriminating ones replace it, each separating your mechanism from a different one. And then you did the thing nobody else did — see below. Brief revised before any modeling, canonical path, frontmatter hypothesis matching the body. |
+| **Final** | **97 / 100** | entered |
 
-### What I'd fix first
+### The tolerance band, which is the best thing in this cohort's briefs
 
-- Use the rates you already identified as the important input. You wrote that the diminishing-returns percentages are what the mix is most sensitive to. Take that seriously for one more paragraph: tomatoes compound labor at 10% per bed, carrots at 2.5%, mesclun at 1.25%. The 20th tomato bed carries a factor of 1.10^20, which is about 6.7 times the labor per bed of the first. Ask yourself whether an $8,800 price still covers that. You may still conclude tomatoes go to the cap — but then you will have an argument rather than a ranking, and an argument is what Stage 3 can grade you against.
+"I would not consider the hypothesis wrong if the resulting bed counts were similar to my guess, with tomato, mesclun, and carrot counts each shifting by 3 or fewer in either direction."
 
-- Fix the fertilizer claim. Mesclun is $880 per bed, the same as tomatoes; carrots are $440. Your sentence has mesclun as the cheap one, which reverses the actual cost ordering and makes the rest of the sentence lean on a fact that is not there.
+Twenty-two people have written a brief for this stage and you are the only one who wrote that sentence. Here is why it matters more than it looks.
 
-- Make the falsification test discriminating. "A different allocation would prove me wrong" cannot fail informatively. Replace it with outcomes that separate your mechanism from a different one: tomatoes finishing well short of 20 would mean the labor penalty bites before the cap does, which is the specific thing your ranking argument assumes away. Carrots reaching their cap while tomatoes do not would mean the ordering is driven by marginal cost rather than by headline margin.
+Every other falsification condition in this cohort, including the good ones, is a threshold with no width: "if the model plants more than 10 tomato beds." That treats 11 beds and 18 beds as the same verdict. They are not. Eleven means the mechanism was right and the crossover estimate was off by one. Eighteen means the compounding does not bite anywhere near where you said, and the mechanism is what failed. A test that cannot tell those apart cannot teach you anything in Stage 3.
 
-### One thing worth saying
+The other reason is that you decided it before you could see the answer. A tolerance chosen afterwards is not a tolerance — it is a rationalization with a number in it.
 
-Writing "this is my starting intuition, not a derived answer" in a graded document takes some nerve, and you were right to do it. A brief that is honestly wrong is worth more in Stage 3 than one that hedges until it cannot be wrong. Keep the honesty and add the arithmetic.
+### The one point still out, and it is a small one
 
-### Looking ahead to Stage 2 and 3
+You write that where the tomato crossover falls "is what the model needs to solve for — it isn't something a ranking by headline price can answer." Both halves are true, and the second half is the insight. But the stage rewards the guess anyway.
 
-Freeze the brief now. If the model comes back at 10 tomato beds rather than 20, that gap is your Stage 3 material, and explaining why your ranking intuition missed the compounding is a better reflection than having guessed right would have been.
+You have everything you need for one. The compounding multiplier and the fixed $8,800 price are both in your hands; naming the bed where you think they cross, and being wrong about it, is worth more in Stage 3 than declining to name it and being right that it was hard to name.
+
+### What to carry into Stage 1.2
+
+Your falsification section is already half a validation section. "Tomatoes at or near their cap of 20" and "carrots short of their cap" are acceptance tests — rows on a Checks sheet with a required value, an actual value, and a pass or fail. So is the tolerance band: it becomes the tolerance column, which is the thing most workbooks in this cohort are missing.
+
+There is nothing at capabilities/marginal-analysis/spec.md yet, and the stage is due 6 September. The specification comes before the workbook and the sequence is the point — the commit history is what proves the model was built from a written contract, rather than the contract written afterwards to match a model that already existed.
 
 ---
 
