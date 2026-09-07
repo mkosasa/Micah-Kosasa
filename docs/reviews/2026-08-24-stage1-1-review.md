@@ -30,7 +30,7 @@ You have everything you need for one. The compounding multiplier and the fixed $
 
 Your falsification section is already half a validation section. "Tomatoes at or near their cap of 20" and "carrots short of their cap" are acceptance tests — rows on a Checks sheet with a required value, an actual value, and a pass or fail. So is the tolerance band: it becomes the tolerance column, which is the thing most workbooks in this cohort are missing.
 
-There is nothing at capabilities/marginal-analysis/spec.md yet, and the stage is due 6 September. The specification comes before the workbook and the sequence is the point — the commit history is what proves the model was built from a written contract, rather than the contract written afterwards to match a model that already existed.
+There is nothing at capabilities/marginal-analysis/spec.md yet, and the stage is due 11 September. The specification comes before the workbook and the sequence is the point — the commit history is what proves the model was built from a written contract, rather than the contract written afterwards to match a model that already existed.
 
 ---
 
