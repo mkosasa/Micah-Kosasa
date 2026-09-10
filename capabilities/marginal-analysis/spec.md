@@ -92,11 +92,14 @@ fraction** (0.10, 0.025, 0.0125) in its own cell; the "%" below is presentation.
 |---|---|---|---|---|---|
 | `DIM_PCT(c)` | 10.00% | 2.50% | 1.25% | per bed (decimal) | Case scenario, crop table |
 | `FERT_BED(c)` | 880 | 440 | 880 | USD per bed | Case scenario, crop table |
-| `LABOR_HRS_WK(c)` | 2.50 | 0.833 | 1.25 | hours per week per bed | Case scenario, crop table |
+| `LABOR_HRS_WK(c)` | 2.50 | 5/6 | 1.25 | hours per week per bed | Case scenario, crop table |
 | `PRICE(c)` | 8,800 | 2,094 | 2,700 | USD per bed | Case scenario, crop table |
 | `MAX_BEDS(c)` | 20 | 20 | 30 | beds | Case scenario, crop table |
 
-`LABOR_HRS_WK(CAR)` is `0.833` exactly as printed — not `5/6`.
+`LABOR_HRS_WK(CAR)` is `5/6` (0.8333…), held at full precision in its own
+cell — this is the value behind the Stage 2 published check figures. The crop
+table prints it as `0.833`; an earlier draft of this spec took that literally,
+which put season profit `$6.49` above the published check. See Audit findings.
 
 ### Decision variables
 | Name | Unit | Source |
@@ -290,20 +293,20 @@ to the cent; the workbook carries full precision.
 | Figure | Value |
 |---|---|
 | `LABOR_HRS(TOM, 5)` | 724.7295 hrs |
-| `LABOR_HRS(CAR, 5)` | 169.6433 hrs |
+| `LABOR_HRS(CAR, 5)` | 169.7112 hrs |
 | `LABOR_HRS(MES, 5)` | 239.4185 hrs |
-| `TOTAL_LABOR_HRS` | 1,133.7913 hrs |
+| `TOTAL_LABOR_HRS` | 1,133.8592 hrs |
 | `FARMER_HRS_USED` | 720.0000 hrs |
-| `TEMP_LABOR_HRS` | 413.7913 hrs |
-| `TOTAL_LABOR_COST` | 32,183.88 |
-| `BLENDED_RATE` | 28.386068 USD/hr |
-| `ALLOC_LABOR_COST(TOM)` | 20,572.22 |
-| `ALLOC_LABOR_COST(CAR)` | 4,815.51 |
-| `ALLOC_LABOR_COST(MES)` | 6,796.15 |
+| `TEMP_LABOR_HRS` | 413.8592 hrs |
+| `TOTAL_LABOR_COST` | 32,185.06 |
+| `BLENDED_RATE` | 28.385407 USD/hr |
+| `ALLOC_LABOR_COST(TOM)` | 20,571.74 |
+| `ALLOC_LABOR_COST(CAR)` | 4,817.32 |
+| `ALLOC_LABOR_COST(MES)` | 6,795.99 |
 | `TOTAL_REVENUE` | 67,970 |
 | `TOTAL_FERT_COST` | 11,000 |
 | `FIXED_COSTS` | 20,000 |
-| `PROFIT` | 4,786.12 |
+| `PROFIT` | 4,784.94 |
 
 Cross-checks:
 - **Farm Profit Lab.** Reconcile `PROFIT`, `TOTAL_LABOR_HRS`, `BLENDED_RATE`,
@@ -362,14 +365,19 @@ calculation `1 x 2.50 x 36 x 1.10` = 99 hours — PASS.
   cells on load. The rest of the workbook loaded intact. Fixed by
   emitting the columns in order; the generator now also checks
   column order on every sheet. Corrected `model.xlsx` rebuilt.
-- **Season profit vs. published check figure.** At the optimal mix the
-  model computes season profit of `42,768.49`; the Stage 2 case page's
-  published check states `42,762`. Optimal mix itself matches
-  (`q(TOM)=10`, `q(CAR)=20`, `q(MES)=30`). Variance: model is `6.49`
-  higher (about 0.015%). Cause traced: substituting
-  `LABOR_HRS_WK(CAR) = 5/6` (0.83333...) for the spec's `0.833` gives
-  `42,761.66`, which rounds to the published `42,762` (within `$0.34`).
-  The published figure was derived with the carrot labor coefficient as
-  `5/6`; this spec mandates `0.833` exactly ("not `5/6`"), so the model
-  is correct as specified and the gap is the known, deliberate
-  coefficient choice — not a model defect.
+- **Season profit vs. published check figure.** The Stage 2 case page's
+  published check states season profit of `42,762`. The first build,
+  reading `LABOR_HRS_WK(CAR)` as the printed `0.833`, computed
+  `42,768.49` — `$6.49` high. Traced: recomputing with
+  `LABOR_HRS_WK(CAR) = 5/6` (0.8333…) gives `42,761.66`, which rounds to
+  the published `42,762` (within `$0.34`); the published figures use
+  `5/6`. Resolved by changing the spec's `LABOR_HRS_WK(CAR)` to `5/6`
+  (held exact) and rebuilding. The model now computes `42,761.66` at the
+  optimal mix `q(TOM)=10`, `q(CAR)=20`, `q(MES)=30`, which the enumeration
+  region confirms as the maximum-profit feasible combination — matches
+  the published check.
+- **`q = (5, 5, 5)` worked example.** The workbook reproduces the
+  reconciliation table by live formula at the anchor allocation; both
+  tie-outs (`SUM(ALLOC_LABOR_COST) = TOTAL_LABOR_COST`,
+  `SUM(MARGIN) = PROFIT + FIXED_COSTS`) close to zero. `PROFIT` at the
+  anchor is `4,784.94` (was `4,786.12` before the `5/6` change) — PASS.

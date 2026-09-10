@@ -24,7 +24,7 @@ changes as more units are committed.
 
 | Engagement | Brief | Status |
 |---|---|---|
-| perfect-competition | `docs/briefs/perfect-competition-brief.md` | Spec written; model built (`model.xlsx`); audit pending |
+| perfect-competition | `docs/briefs/perfect-competition-brief.md` | Spec written; model built (`model.xlsx`); audit findings recorded |
 
 ## Resolved modeling questions
 
