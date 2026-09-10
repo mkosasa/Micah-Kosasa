@@ -350,4 +350,11 @@ figures and record any variance.
 Example entry — At `q = 1`, `LABOR_HRS(TOM, 1)` returned 99 hours; hand
 calculation `1 x 2.50 x 36 x 1.10` = 99 hours — PASS.
 
-Not yet audited — no model has been built from this spec.
+### Findings
+
+- **`q = 1` by hand.** One bed of tomatoes should need
+  `1 x 2.5 x 36 x 1.10` hours. Verified on the workbook that
+  `LABOR_HRS(TOM, 1)` equals 99 — PASS.
+- **File integrity.** The Excel file required repair when opened; it may
+  have been corrupted. Root cause under investigation; a corrected
+  rebuild is in progress.
