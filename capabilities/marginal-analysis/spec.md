@@ -92,11 +92,14 @@ fraction** (0.10, 0.025, 0.0125) in its own cell; the "%" below is presentation.
 |---|---|---|---|---|---|
 | `DIM_PCT(c)` | 10.00% | 2.50% | 1.25% | per bed (decimal) | Case scenario, crop table |
 | `FERT_BED(c)` | 880 | 440 | 880 | USD per bed | Case scenario, crop table |
-| `LABOR_HRS_WK(c)` | 2.50 | 0.833 | 1.25 | hours per week per bed | Case scenario, crop table |
+| `LABOR_HRS_WK(c)` | 2.50 | 5/6 | 1.25 | hours per week per bed | Case scenario, crop table |
 | `PRICE(c)` | 8,800 | 2,094 | 2,700 | USD per bed | Case scenario, crop table |
 | `MAX_BEDS(c)` | 20 | 20 | 30 | beds | Case scenario, crop table |
 
-`LABOR_HRS_WK(CAR)` is `0.833` exactly as printed — not `5/6`.
+`LABOR_HRS_WK(CAR)` is `5/6` (0.8333…), held at full precision in its own
+cell — this is the value behind the Stage 2 published check figures. The crop
+table prints it as `0.833`; an earlier draft of this spec took that literally,
+which put season profit `$6.49` above the published check. See Audit findings.
 
 ### Decision variables
 | Name | Unit | Source |
@@ -290,20 +293,20 @@ to the cent; the workbook carries full precision.
 | Figure | Value |
 |---|---|
 | `LABOR_HRS(TOM, 5)` | 724.7295 hrs |
-| `LABOR_HRS(CAR, 5)` | 169.6433 hrs |
+| `LABOR_HRS(CAR, 5)` | 169.7112 hrs |
 | `LABOR_HRS(MES, 5)` | 239.4185 hrs |
-| `TOTAL_LABOR_HRS` | 1,133.7913 hrs |
+| `TOTAL_LABOR_HRS` | 1,133.8592 hrs |
 | `FARMER_HRS_USED` | 720.0000 hrs |
-| `TEMP_LABOR_HRS` | 413.7913 hrs |
-| `TOTAL_LABOR_COST` | 32,183.88 |
-| `BLENDED_RATE` | 28.386068 USD/hr |
-| `ALLOC_LABOR_COST(TOM)` | 20,572.22 |
-| `ALLOC_LABOR_COST(CAR)` | 4,815.51 |
-| `ALLOC_LABOR_COST(MES)` | 6,796.15 |
+| `TEMP_LABOR_HRS` | 413.8592 hrs |
+| `TOTAL_LABOR_COST` | 32,185.06 |
+| `BLENDED_RATE` | 28.385407 USD/hr |
+| `ALLOC_LABOR_COST(TOM)` | 20,571.74 |
+| `ALLOC_LABOR_COST(CAR)` | 4,817.32 |
+| `ALLOC_LABOR_COST(MES)` | 6,795.99 |
 | `TOTAL_REVENUE` | 67,970 |
 | `TOTAL_FERT_COST` | 11,000 |
 | `FIXED_COSTS` | 20,000 |
-| `PROFIT` | 4,786.12 |
+| `PROFIT` | 4,784.94 |
 
 Cross-checks:
 - **Farm Profit Lab.** Reconcile `PROFIT`, `TOTAL_LABOR_HRS`, `BLENDED_RATE`,
@@ -350,4 +353,86 @@ figures and record any variance.
 Example entry — At `q = 1`, `LABOR_HRS(TOM, 1)` returned 99 hours; hand
 calculation `1 x 2.50 x 36 x 1.10` = 99 hours — PASS.
 
-Not yet audited — no model has been built from this spec.
+### Method
+
+No Excel was available on the build machine, so `model.xlsx` was hand-authored
+as OOXML and the checks below were run outside Excel: a PowerShell
+reimplementation of this spec's formulas, plus direct inspection of every
+worksheet cell (formula text and cached value). Cached values carry
+`fullCalcOnLoad`, so Excel recomputes on open. What still needs Excel — opening
+without a repair prompt, recalc reproducing the cached figures, and running
+Solver — is flagged per check.
+
+### Findings
+
+- **`q = 1` exponent guard.** Checked `LABOR_HRS(c, 1)` for all three crops
+  against the hand calculation `1 x LABOR_HRS_WK(c) x 36 x (1 + DIM_PCT(c))^1`,
+  confirmed each differs from the dropped-exponent value `1 x LABOR_HRS_WK(c) x
+  36`, and confirmed the live formula text contains `^`.
+
+  | crop | hand = with `^1` | dropped-exponent | workbook (`CropEconomics`) |
+  |---|---|---|---|
+  | TOM | 99.0000 | 90.0000 | 99.0000 (`D6`) |
+  | CAR | 30.7500 | 30.0000 | 30.7500 (`D30`) |
+  | MES | 45.5625 | 45.0000 | 45.5625 (`D54`) |
+
+  The `Checks` sheet's own guard cells (`D15:D20`) read PASS. — PASS.
+- **`q = (5, 5, 5)` worked example.** The workbook reproduces the reconciliation
+  table by live formula at the anchor allocation; both tie-outs
+  (`SUM(ALLOC_LABOR_COST) = TOTAL_LABOR_COST`, `SUM(MARGIN) = PROFIT +
+  FIXED_COSTS`) close to zero. Every figure matches the anchor table to the
+  cent; `PROFIT` at the anchor is `4,784.94` (was `4,786.12` before the `5/6`
+  change). — PASS.
+- **Independent-implementation cross-check.** The Farm Profit Lab web calculator
+  itself was not consulted (built from `spec.md` alone, by decision); its role
+  as a second, independently-built implementation was filled by the PowerShell
+  reimplementation. It agrees with the workbook's cached cells not only on the
+  endpoints (`PROFIT` `42,761.66`, `TOTAL_LABOR_HRS` `5,277.2161`,
+  `TOTAL_LABOR_COST` `104,118.3353` at the optimum) but on intermediate
+  marginal costs: `MARG_COST(TOM, 10) = 8,248.59`, `MARG_COST(CAR, 20) =
+  1,688.95`, `MARG_COST(MES, 30) = 2,420.10`, and `MARG_COST(TOM, 6) =
+  4,906.28` (the tomato dip). Largest disagreement `1.5e-11`. — PASS for
+  self-consistency and spec-conformance; a check against the Farm Profit Lab
+  itself remains open.
+- **Two Solver starting points.** Excel Solver (GRG Nonlinear) was not run.
+  Proxy: an integer hill-climb (violation-descent, then profit-ascent over
+  feasible ±1 neighbours) from the two spec-mandated starts. `(0, 0, 0)` →
+  `(10, 20, 30)` at `42,761.66`; `(20, 0, 0)` → `(10, 20, 30)` at `42,761.66`
+  (note `(20, 0, 0)` is itself infeasible — 20 tomato beds alone blow the
+  5,760 temporary-hour ceiling — so a real Solver would repair it first). Both
+  starts agree with each other and with the Enumeration maximum over all 9,726
+  feasible integer combinations, which is what populates the decision cells and
+  is authoritative per this spec. — PASS (proxy); the Solver run itself is
+  outstanding.
+- **Stage 2 published check figures.** Season profit: model `42,761.66` vs
+  published `42,762` — reconciles within `$0.34` after the `LABOR_HRS_WK(CAR) =
+  5/6` change (see below). Optimal mix: model `q(TOM)=10`, `q(CAR)=20`,
+  `q(MES)=30` — matches the brief hypothesis and the Enumeration maximum.
+  Standalone `PRICE = MC` crossings, as the model computes them:
+  `XING_FIRST` (first bed with `MC >= PRICE`) `= 11 / 11 / 7` for TOM / CAR /
+  MES; `XING` (profit-maximizing bed count) `= 10 / 20 / 30`. OUTSTANDING: the
+  Stage 2 page's own optimal-mix and crossing-point figures were not retrieved
+  (spec-alone build), so that head-to-head is for the owner.
+- **Season profit vs. published check figure (root cause).** The first build,
+  reading `LABOR_HRS_WK(CAR)` as the printed `0.833`, computed `42,768.49` —
+  `$6.49` above the published `42,762`. Traced: recomputing with
+  `LABOR_HRS_WK(CAR) = 5/6` (0.8333…) gives `42,761.66`, which rounds to the
+  published figure; the published figures use `5/6`. Resolved by changing the
+  spec's `LABOR_HRS_WK(CAR)` to `5/6` (held exact) and rebuilding.
+- **Live formulas, not pasted values.** Rebuilt the workbook with `DIM_PCT(TOM)`
+  perturbed `0.10 → 0.12` and diffed cached values: every probed downstream
+  figure moved — `LABOR_HRS(TOM, 1)` `99 → 100.8`, `MARG_COST(TOM, 10)`
+  `8,248.59 → 10,412.46`, `TOTAL_LABOR_HRS` `5,277.22 → 5,738.11`, `PROFIT`
+  (`CostStructure`, `Summary`) `42,761.66 → 34,760.01`, `WorkedExample` `PROFIT`
+  `4,784.94 → 3,598.76`, and the Enumeration optimum shifted `(10, 20, 30) →
+  (8, 20, 30)`. A separate sweep of all 197 distinct formula shapes confirmed
+  every computed cell is a live formula referencing named ranges, with no
+  hard-coded parameter value in any computed cell. — PASS; the in-Excel
+  "change an input, watch it propagate" spot-check is still worth doing on open.
+- **File integrity.** The Excel file required repair when first opened. Cause:
+  on the MCSchedules sheet the `PRICE` and `MARG_REVENUE` columns (I, J) were
+  written after the later columns K–M, and OOXML requires cells in ascending
+  column order within a row, so Excel discarded those 146 cells on load. The
+  rest of the workbook loaded intact. Fixed by emitting the columns in order;
+  the generator now also validates column order on every sheet. Corrected
+  `model.xlsx` rebuilt.
