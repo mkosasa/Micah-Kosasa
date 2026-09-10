@@ -11,6 +11,8 @@ built_with: "Claude Code, from this file"
 
 **Sources.** Case scenario and crop table, and the Stage 2 build requirements:
 `https://adamwstauffer.github.io/ai-lms/case-perfect-competition-stage2.html`.
+Cross-validation reference (Farm Profit Lab):
+`https://adamwstauffer.github.io/ai-lms/farmlab.html`.
 Every input below traces to the case scenario; the labor formula and the two
 labor conventions are stated on the Stage 2 page.
 
@@ -46,8 +48,16 @@ meets marginal cost.
   limit.
 - **Exponent guard** — the `q = 1` hand check confirming `(1 + DIM_PCT(c)) ^ q`
   was built with the exponent, not dropped.
-- **Farm Profit Lab** — the reference implementation of this same model supplied
-  with the case, used for cross-validation. Location: `<fill in: path or URL>`.
+- **Farm Profit Lab** — an interactive web calculator
+  (`https://adamwstauffer.github.io/ai-lms/farmlab.html`), a separate
+  implementation of this same model: same labor formula
+  `q x hrs/wk x 36 x (1 + dim) ^ q`, same permanent-before-temporary split at
+  `FARMER_RATE` / `TEMP_WORKER_RATE`, same 64-bed / three-crop structure with the
+  carrot cap. It reports revenue, total labor hours, the farmer / temporary
+  labor-cost split, fertilizer and fixed costs, total profit, and a
+  marginal-cost-vs-price chart per crop. Use it for the cross-check in
+  Validation. Note: the Lab explains the tomato marginal-cost dip on screen;
+  this spec still defers that explanation to Stage 3.
 
 ## Inputs — the named contract
 
