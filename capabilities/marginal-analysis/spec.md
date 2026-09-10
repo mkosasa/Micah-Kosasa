@@ -355,6 +355,10 @@ calculation `1 x 2.50 x 36 x 1.10` = 99 hours — PASS.
 - **`q = 1` by hand.** One bed of tomatoes should need
   `1 x 2.5 x 36 x 1.10` hours. Verified on the workbook that
   `LABOR_HRS(TOM, 1)` equals 99 — PASS.
-- **File integrity.** The Excel file required repair when opened; it may
-  have been corrupted. Root cause under investigation; a corrected
-  rebuild is in progress.
+- **File integrity.** The Excel file required repair when opened. Cause:
+  on the MCSchedules sheet the `PRICE` and `MARG_REVENUE` columns (I, J)
+  were written after the later columns K–M, and OOXML requires cells in
+  ascending column order within a row, so Excel discarded those 146
+  cells on load. The rest of the workbook loaded intact. Fixed by
+  emitting the columns in order; the generator now also checks
+  column order on every sheet. Corrected `model.xlsx` rebuilt.
