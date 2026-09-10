@@ -12,14 +12,19 @@ changes as more units are committed.
   supply, the per-crop crop table, the calculation logic in named-range
   notation, the conventions, and the validation rules the built model must pass.
 - `README.md` — this file.
-- `model.xlsx` — the Solver workbook, built from `spec.md`. Not yet built;
-  commit it after `spec.md`, never before.
+- `model.xlsx` — the Solver workbook, built from `spec.md` (9 sheets: Inputs,
+  CropEconomics, MCSchedules, CostStructure, Enumeration, Optimization,
+  WorkedExample, Checks, Summary). Every input is a named range; every calculated
+  cell is a formula; the Checks sheet computes the validation rules as live
+  PASS/FAIL flags. Built by Claude Code without Excel available, so cell values
+  are cached and `fullCalcOnLoad` is set — open in Excel to recalculate and to
+  run Solver. Audit findings not yet written.
 
 ## Engagements
 
 | Engagement | Brief | Status |
 |---|---|---|
-| perfect-competition | `docs/briefs/perfect-competition-brief.md` | Spec written; model not built |
+| perfect-competition | `docs/briefs/perfect-competition-brief.md` | Spec written; model built (`model.xlsx`); audit pending |
 
 ## Resolved modeling questions
 
