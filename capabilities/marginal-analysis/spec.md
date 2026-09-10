@@ -362,3 +362,14 @@ calculation `1 x 2.50 x 36 x 1.10` = 99 hours — PASS.
   cells on load. The rest of the workbook loaded intact. Fixed by
   emitting the columns in order; the generator now also checks
   column order on every sheet. Corrected `model.xlsx` rebuilt.
+- **Season profit vs. published check figure.** At the optimal mix the
+  model computes season profit of `42,768.49`; the Stage 2 case page's
+  published check states `42,762`. Optimal mix itself matches
+  (`q(TOM)=10`, `q(CAR)=20`, `q(MES)=30`). Variance: model is `6.49`
+  higher (about 0.015%). Cause traced: substituting
+  `LABOR_HRS_WK(CAR) = 5/6` (0.83333...) for the spec's `0.833` gives
+  `42,761.66`, which rounds to the published `42,762` (within `$0.34`).
+  The published figure was derived with the carrot labor coefficient as
+  `5/6`; this spec mandates `0.833` exactly ("not `5/6`"), so the model
+  is correct as specified and the gap is the known, deliberate
+  coefficient choice — not a model defect.
