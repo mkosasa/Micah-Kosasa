@@ -49,3 +49,4 @@ started: 2026-08-23
 
 ## Errors caught
 - 2026-08-23 — none identified; all factual claims (Queen's size/scope, official org names) were verified via web search before inclusion.
+- 2026-09-03 — A routine wrote a Drive file replacement as trash-old-then-create-new. Interrupted between the two steps, that leaves zero copies and loses every row; the DLEMBA tracker went missing this way. Always create and confirm the replacement BEFORE trashing the original.
