@@ -1,4 +1,4 @@
-<!-- Micah's draft is unchanged in the commit before this one. Added since: the five bracketed placeholders are filled in [brackets] with cell references, and blocks labelled "Model support" (sheet!cell = value) or "Check" (a number or cell in the draft that did not match the model, or a point to look at) follow the paragraphs they support. All were added by Claude; rephrase or delete them in your own words. Values are from capabilities/marginal-analysis/model.xlsx on main (blob cc3684e). -->
+<!-- Micah's draft is the first commit of this PR, verbatim. Added since: (1) the five bracketed placeholders are filled in [brackets] with cell references; (2) blocks labelled "Model support" (sheet!cell = value) or "Check" (a point to look at) follow the paragraphs they support, all added by Claude; (3) at Micah's request, four factual corrections inside his sentences (cell columns K14:K16, "going up", the workers clause, the Unconstrained tab), listed in the third commit. Rephrase or delete the added blocks in your own words. Values are from capabilities/marginal-analysis/model.xlsx on main (blob cc3684e). -->
 
 # Farm Model Analysis
 
@@ -17,11 +17,12 @@ Refer to cell H15 under MC schedules on the model for the ten-bed marginal cost,
 > - `MCSchedules!H16` = $9,390.72, the 11th bed: $590.72 above the price (`Unconstrained!D71` = −$590.72, also `Summary!I36`).
 > - `MCSchedules!B27` = 10 (best bed count) and `MCSchedules!B28` = 11 (first bed where marginal cost reaches price).
 
-Another place to see this is where the profit is constantly rising — rising at nine, then ten, then eleven — you can see it drop. This can be seen in cells H15, H16, and H17.
+Another place to see this is where the profit is constantly rising — rising at nine, then ten, then eleven — you can see it drop. This can be seen in cells K14, K15, and K16 under MC schedules.
 
-> **Check** — H15, H16 and H17 are marginal *costs*, and they keep rising ($8,248.59, $9,390.72, $10,687.59). Profit is column K on the same rows:
+> **Model support** — profit is column K on the tomato rows of `MCSchedules` (bed number = row − 5):
 > - `MCSchedules!K14` (9 beds) = $25,621.36; `MCSchedules!K15` (10 beds) = $26,172.77; `MCSchedules!K16` (11 beds) = $25,582.06.
-> - Profit rises through bed 10 (+$551.41) and drops at bed 11 (−$590.72), so K14:K16 is the range that shows what you describe. These K values are standalone profit before the $20,000 fixed costs.
+> - Profit rises through bed 10 (+$551.41) and drops at bed 11 (−$590.72). These K values are standalone profit before the $20,000 fixed costs.
+> - Column H on the same rows is the marginal cost, which keeps rising: `H15` $8,248.59, `H16` $9,390.72, `H17` $10,687.59.
 
 **Which constraints bind, and what relaxing one is worth**
 
@@ -58,20 +59,17 @@ One thing I want to do a comparison on — and I'll ask for a model update on th
 > - Maximum profit with no limits: $45,010.80 (`Unconstrained!E20`), from 10 / 26 / 37 beds = 73 (`Unconstrained!B7:E7`).
 > - So worker hours were not what stopped the plan; the crop caps were.
 
-One thing to consider: I've created a scenario, in the fertilizer discount section above, of releasing the limitations/constraints. One of the impacts not being considered there is the cost of increasing the amount of land being used — if that included an additional fixed cost, that may change the situation. We don't have that cost for additional land, but what we saw is that, without the constraints, due to diminishing returns, it actually ends up being a fairly small increased profit — around $2,000. [$2,249.13 (`Unconstrained!E22`)]
+One thing to consider: I've created a scenario, in the Unconstrained tab, of releasing the limitations/constraints. One of the impacts not being considered there is the cost of increasing the amount of land being used — if that included an additional fixed cost, that may change the situation. We don't have that cost for additional land, but what we saw is that, without the constraints, due to diminishing returns, it actually ends up being a fairly small increased profit — around $2,000. [$2,249.13 (`Unconstrained!E22`)]
 
-> **Check** — releasing the limits is the `Unconstrained` sheet. The fertilizer discount is a separate sheet, `FertScenario`, so "in the fertilizer discount section above" may need to point to `Unconstrained`.
->
 > **Model support**
 > - Extra profit from releasing the limits: $2,249.13 (`Unconstrained!E22`) = $45,010.80 (`Unconstrained!E20`) − $42,761.66 (`Unconstrained!E21`, the model's `PROFIT`, also `CostStructure!B21`). That is about 5.3% more.
 > - Land needed: 73 beds is 9 more than the 64 you have (`Unconstrained!D26`) and 13 more than the 60 planted (`Unconstrained!D27`).
 > - The model has no cost for extra land: fixed costs stay $20,000 (`Inputs!B6`).
 
-Therefore, unless the cost of adding land is very small, this probably would not be a useful thing to invest in — the additional land — or if hiring more workers added other overhead costs, there just wouldn't really be an increase. This really points to the fact that while these constraints do put some limitations on profitability, we're seeing a fairly quick drop in profitability as we add more and more beds, due to diminishing returns. Adding more beds is really just not a way to maximize an increase in profits.
+Therefore, unless the cost of adding land is very small, this probably would not be a useful thing to invest in — the additional land — or if hiring more workers added other overhead costs (only the fertilizer-discount scenario needs more than the current four workers, about 4.81), there just wouldn't really be an increase. This really points to the fact that while these constraints do put some limitations on profitability, we're seeing a fairly quick drop in profitability as we add more and more beds, due to diminishing returns. Adding more beds is really just not a way to maximize an increase in profits.
 
-> **Check** — "if hiring more workers added other overhead costs": with the limits released and no discount, no extra workers are needed (3.98 needed, limit 4: `Unconstrained!B34`, `Unconstrained!C34`). Extra workers appear only with the discount: 4.81 needed (`FertScenario!F18`), about 0.81 above the limit.
->
 > **Model support**
+> - Workers: with the limits released and no discount, no extra workers are needed (3.98 needed, limit 4: `Unconstrained!B34`, `Unconstrained!C34`). Only the fertilizer-discount scenario needs more: 4.81 (`FertScenario!F18`), about 0.81 above the limit.
 > - Diminishing returns in dollars (price minus marginal cost, `Unconstrained`): the first carrot bed adds $1,120.15 (`I61`), the 20th $405.05 (`I80`), the 26th $60.77 (`I86`); the 27th would lose $3.81 (`I87`). Mesclun: $1,028.98 for the first bed (`N61`), $279.90 at bed 30 (`N90`), $33.07 at bed 37 (`N97`), −$4.73 at bed 38 (`N98`).
 > - The most extra land could cost: $2,249.13 ÷ 9 extra beds ≈ $250 per bed per season, before any other overhead. (Derived; not a workbook cell.)
 > - The extra labor is already counted: labor cost is $124,533.20 released (`Unconstrained!E18`) against $104,118.34 today (`CostStructure!B9`), $20,414.87 more, and the $2,249.13 is after that.
@@ -80,11 +78,9 @@ The biggest thing would be looking at possibly another crop — one that lets yo
 
 **The tomato marginal cost dip at six beds**
 
-The marginal costs are going down, then suddenly dip at six, because of the change in labor costs — coming from the more expensive farmer at [$34.72 per hour (`Inputs!B9`)] to the temporary workers at [$17.36 per hour (`Inputs!B12`)] — resulting in a significant dip in the marginal costs at six. In some ways this resets the profitability concern: if there had not been that change in the workers' wages — let's say the farmer had more available hours, or we were required to hire another farmer at the same rate — the max beds would hit far earlier than 10.
+The marginal costs are going up, then suddenly dip at six, because of the change in labor costs — coming from the more expensive farmer at [$34.72 per hour (`Inputs!B9`)] to the temporary workers at [$17.36 per hour (`Inputs!B12`)] — resulting in a significant dip in the marginal costs at six. In some ways this resets the profitability concern: if there had not been that change in the workers' wages — let's say the farmer had more available hours, or we were required to hire another farmer at the same rate — the max beds would hit far earlier than 10.
 
-> **Check** — marginal cost is *rising* until bed 5, then dips: $4,317.50 at bed 1 (`MCSchedules!H6`), $7,660.86 at bed 5 (`MCSchedules!H10`), then $4,906.28 at bed 6 (`MCSchedules!H11`), a $2,754.58 drop.
->
-> **Model support**
+> **Model support** — marginal cost rises from $4,317.50 at bed 1 (`MCSchedules!H6`) to $7,660.86 at bed 5 (`MCSchedules!H10`), then dips to $4,906.28 at bed 6 (`MCSchedules!H11`), a $2,754.58 drop.
 > - The model flags it: `MCSchedules!M11` = "DIP" and `MCSchedules!B29` = "yes - non-monotonic".
 > - The switch happens at bed 5: cumulative labor there is 724.73 hours (`MCSchedules!B10`), just past the farmer's 720 hours (`Inputs!B7`). The farmer's $34.72 an hour is $25,000 of the $50,000 salary (`Inputs!B8`) over those 720 hours; a temp worker's $17.36 an hour is $25,000 (`Inputs!B10`) over 1,440 hours (`Inputs!B11`).
 > - "Far earlier than 10" holds: if every hour cost $34.72, the 6th tomato bed would cost about $8,932.55, above the $8,800 price, so tomatoes would stop at 5 beds (the 5th costs $7,742.97). (Calculated from the `Inputs` values outside the workbook; not a workbook cell.)
