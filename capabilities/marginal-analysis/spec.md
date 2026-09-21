@@ -341,6 +341,14 @@ the build — they are intentionally not restated here as acceptance criteria.
 - Binding constraint at the optimum — one of: the 64-bed total, the 5,760
   temporary-hour ceiling, a crop's `MAX_BEDS(c)`, or "interior".
 - The tomato marginal-cost-schedule dip — surfaced as a flag, not explained.
+- Shadow prices (added for Stage 3; `Summary` rows 32–45, named
+  `SHADOW_PRICE_TOM`, `SHADOW_PRICE_CAR`, `SHADOW_PRICE_MES`) — for a crop at its
+  `MAX_BEDS(c)`, `PRICE(c)` minus the farm-level marginal cost of bed `q+1`,
+  where the extra hours are priced farmer hours first at `FARMER_RATE`, then
+  `TEMP_WORKER_RATE`; zero when the constraint is not binding. The block also
+  reports slack on the 64-bed total and the temporary-hour ceiling, and a
+  tie-out of the farmer-first labor cost to `TOTAL_LABOR_COST`. Valid for one
+  extra bed only.
 
 ## Audit findings
 Added after the model is built. For each check: what was checked, what was
