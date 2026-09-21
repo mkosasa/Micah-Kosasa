@@ -20,7 +20,10 @@ changes as more units are committed.
   are cached and `fullCalcOnLoad` is set. The manual audits (the checks that
   needed Excel) were completed by Micah; findings are in `spec.md`. `Summary`
   rows 32–45 hold the Stage 3 shadow-price block (named outputs
-  `SHADOW_PRICE_TOM/CAR/MES`).
+  `SHADOW_PRICE_TOM/CAR/MES`). `MCSchedules` rows 105–152 continue the carrot and
+  mesclun standalone schedules past their caps to the profit peak (named outputs
+  `XING_UNCAPPED_CAR/MES`) — a what-if display that changes no result. Both
+  additions came after the manual audits and are not yet audited in Excel.
 
 ## Engagements
 

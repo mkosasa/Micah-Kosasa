@@ -27,7 +27,9 @@ bed allocation that maximizes season profit, the season profit and its cost
 breakdown at that allocation, which constraint stops the allocation where it
 does, what one more bed of a capped crop would add to profit (its shadow price),
 and — for each crop analyzed on its own — the bed count at which price meets
-marginal cost.
+marginal cost. For the two crops that sit at their caps, it also shows where each
+one's own standalone profit would peak if the cap were lifted (a what-if display;
+the cap still binds).
 
 ## Definitions
 - **P&L** — the season profit expression
@@ -54,6 +56,13 @@ marginal cost.
   one-bed step, not a continuous LP dual. For a crop's `MAX_BEDS(c)` cap it is
   `PRICE(c)` minus the farm-level marginal cost of the next bed. A non-binding
   constraint has shadow price 0.
+- **Beyond-cap continuation** — the standalone marginal-cost schedule of a crop
+  that sits at its cap (carrots, mesclun) carried past `MAX_BEDS(c)`, through the
+  bed where `SA_PROFIT` peaks and at least 3 beds after it. A what-if display: it
+  never changes `XING(c)`, the Solver, the Enumeration, or a shadow price.
+- **XING_UNCAPPED(c)** — the bed count that maximizes `SA_PROFIT(c, q)` over the
+  capped schedule and its continuation together: the crop's standalone
+  profit-maximizing bed count if `MAX_BEDS(c)` did not apply.
 - **BLENDED_RATE** — `TOTAL_LABOR_COST / TOTAL_LABOR_HRS`, a single farm-level
   dollars-per-hour figure at the current allocation.
 - **Interior optimum** — no constraint binds: every crop's marginal profit has
@@ -128,7 +137,14 @@ One workbook. Sheets / regions, in this order:
   labor-hour demand as a function of that crop's own bed count `q`.
 - **Marginal-cost schedules** — one block per crop, standalone: total variable
   cost and the marginal cost of the `q`-th bed for `q = 1 .. MAX_BEDS(c)`, set
-  against `PRICE(c)`, with `XING(c)` and `XING_FIRST(c)` reported.
+  against `PRICE(c)`, with `XING(c)` and `XING_FIRST(c)` reported. Below the
+  three blocks, a **beyond-cap continuation** for carrots and mesclun: each
+  block repeats its cap row, then adds beds past `MAX_BEDS(c)` through the
+  `SA_PROFIT` peak and at least 3 beds after it (the schedule's columns plus a
+  `marker` column reading `PEAK` / `after peak`), followed by `XING_UNCAPPED(c)`,
+  the profit at the peak and at the cap, the gain, the beds shown after the peak,
+  and a live PASS / FAIL that at least 3 are shown. Appended below so no
+  existing row moves.
 - **Cost structure** — at the current allocation: total labor hours, the
   farmer / temporary split, total labor cost, the blended labor rate, each
   crop's blended-rate labor charge, total fertilizer cost, fixed costs, total
@@ -187,6 +203,32 @@ The schedule uses `LABOR_COST_SA` — the farmer / temporary split rates — **n
 as cumulative hours pass `FARMER_HRS` is deliberate and is what makes the tomato
 schedule non-monotonic. For a monotonic schedule `XING(c)` and `XING_FIRST(c)`
 coincide; where they differ, both are reported so the dip stays visible.
+
+### Beyond-cap continuation (carrots and mesclun)
+For `c` in `{CAR, MES}` — the two crops that sit at their caps at the solved
+allocation — continue the standalone schedule above for
+`q = MAX_BEDS(c) + 1, MAX_BEDS(c) + 2, ...` with the same formulas (`LABOR_HRS`,
+`FARMER_HRS_USED`, `TEMP_HRS_USED`, `LABOR_COST_SA`, `TVC`, `MARG_COST`,
+`SA_PROFIT`, and the `q if MC >= PRICE` and `DIP` flags). The block's first row
+repeats the cap row `q = MAX_BEDS(c)` by reference, so
+`MARG_COST(c, MAX_BEDS(c) + 1) = TVC(c, MAX_BEDS(c) + 1) - TVC(c, MAX_BEDS(c))`
+reads from it. `MAX_BEDS(c)` is not a bound on this block.
+
+    XING_UNCAPPED(c)   = the q that maximizes SA_PROFIT(c, q) over the capped schedule
+                         (q = 0 .. MAX_BEDS(c)) and the continuation together
+    PEAK_PROFIT(c)     = MAX of SA_PROFIT(c, q) over that same range
+    CAP_PROFIT(c)      = SA_PROFIT(c, MAX_BEDS(c))
+    GAIN(c)            = PEAK_PROFIT(c) - CAP_PROFIT(c)
+    BEDS_AFTER_PEAK(c) = (last q shown) - XING_UNCAPPED(c)
+    marker(q)          = "PEAK" at q = XING_UNCAPPED(c); "after peak" for q above it;
+                         the cap row is labelled "cap"
+
+Extent: build the block out to at least `XING_UNCAPPED(c) + 3`. The built model
+carries 5 beds after each peak, and a live cell reads PASS when
+`BEDS_AFTER_PEAK(c) >= 3`. At the case inputs the crop's own hours already exceed
+`FARMER_HRS` at the cap, so every extra hour costs `TEMP_WORKER_RATE`,
+`MARG_COST(c, q)` keeps rising, and `SA_PROFIT` rises to one peak and then falls;
+`XING_UNCAPPED(c)` is then the last bed with `MARG_COST(c, q) < PRICE(c)`.
 
 ### Roll-up at the current allocation
     TOTAL_LABOR_HRS   = LABOR_HRS(TOM, q(TOM)) + LABOR_HRS(CAR, q(CAR)) + LABOR_HRS(MES, q(MES))
@@ -313,6 +355,25 @@ Tie-out: `LABOR_COST_AT(TOTAL_LABOR_HRS) = TOTAL_LABOR_COST`.
 - **Binding total-bed or temp-hour constraint** — reported as the text
   `binding - re-solve`, not computed.
 
+### Beyond-cap continuation
+- **A what-if, and standalone.** Each crop is modeled as the only crop: all of
+  `FARMER_HRS` to itself, beds free, no 64-bed total, no temporary-hour ceiling.
+  The block answers "where would this crop stop on its own if the cap did not
+  apply," not "plant this many." At the standalone peaks (26 carrot beds, 37
+  mesclun beds) alongside 10 tomato beds the farm would need 73 beds against 64,
+  and the 720 farmer hours cannot serve both crops.
+- **Display only.** Nothing reads the continuation: `XING(c)` and `XING_FIRST(c)`
+  still cover `q = 0 .. MAX_BEDS(c)`, and the Solver, the Enumeration, the
+  shadow-price block and the Checks are unchanged. "Caps bind even mid-margin"
+  (Scope) still holds — the block shows what a cap costs; it does not lift it.
+- **Relation to the shadow price.** Where the crop's own hours already exceed
+  `FARMER_HRS` at the cap (true at the case inputs), the standalone
+  `MARG_COST(c, MAX_BEDS(c) + 1)` equals `NEXT_MC(c)` in the shadow-price block,
+  so `PRICE(c)` minus it equals `SHADOW_PRICE(c)`. The shadow price is the value
+  of the first extra bed; the continuation shows the whole path to the peak.
+- **Placement.** Appended below the existing schedule blocks, so no existing row
+  moves and every existing reference, named range and check is unchanged.
+
 ### Precision and boundaries
 - **Rates are the exact quotient**, carried at full precision. `34.72` / `17.36`
   are display values; no formula reads a rounded rate.
@@ -367,6 +428,11 @@ Structural:
   shadow prices use).
 - `SHADOW_PRICE(c) >= 0` for every crop, and `> 0` only where `CAP_BINDING(c)`.
 - No error values in the shadow-price block.
+- Beyond-cap continuation: its first row equals the cap row of the schedule above;
+  `MARG_COST` and `SA_PROFIT` at every bed match a from-scratch calculation;
+  `SA_PROFIT` is highest at `XING_UNCAPPED(c)` and lower at the next bed; at least
+  3 beds are shown after the peak (a live PASS / FAIL cell); and `XING(c)`,
+  `XING_FIRST(c)`, `Summary` and `Checks` are unchanged by it.
 
 Hand check — the `q = 1` exponent guard:
 - `LABOR_HRS(TOM, 1) = 1 x 2.50 x 36 x 1.10 = 99 hours`, exactly. Repeat for each
@@ -440,6 +506,10 @@ the build — they are intentionally not restated here as acceptance criteria.
   binding status of the 64-bed total, the temporary-hour ceiling, and the implied
   temporary-worker count; and the labor-cost tie-out. Valid for one extra bed
   only.
+- Beyond-cap continuation (added; carrots and mesclun; named `XING_UNCAPPED_CAR`,
+  `XING_UNCAPPED_MES`) — `XING_UNCAPPED(c)`, the standalone `SA_PROFIT` at the peak
+  and at the cap, the gain from lifting the cap, and the beds shown after the
+  peak. A standalone what-if, not a recommendation to exceed a cap.
 
 ## Audit findings
 Added after the model is built. For each check: what was checked, what was
@@ -565,3 +635,33 @@ Solver — is flagged per check.
   — PASS outside Excel. Outstanding: open in Excel (the workbook is set to
   recalculate on open; the stale `calcChain` was removed so Excel rebuilds it)
   and confirm the block recalculates to the same figures without a repair prompt.
+- **Beyond-cap continuation (carrots and mesclun).** Appended below the existing
+  schedules on `MCSchedules` (rows 105–152) by direct OOXML edit; no Excel was
+  available. Checked outside Excel:
+  1. *Nothing else moved.* Every pre-existing cell in all 9 sheets, including the
+     capped `XING` rows, `Summary` and `Checks`: 0 formula diffs, 0 value diffs, 0
+     dropped. `XING` still `10 / 20 / 30`, the shadow prices still `352.49` /
+     `246.47`, `Checks` still 31 PASS. Named ranges `50 → 52`
+     (`XING_UNCAPPED_CAR`, `XING_UNCAPPED_MES`). Only `sheet3.xml` and
+     `workbook.xml` differ from the prior file.
+  2. *From-scratch cross-check.* `TVC`, `MARG_COST` and `SA_PROFIT` at every new
+     bed, recomputed straight from the spec's inputs, agree with the workbook
+     (largest gap `2.9e-11`). The stored text of all 339 new formulas, read back
+     from the saved file, re-evaluates to its cached value.
+  3. *Result.* Carrots: `SA_PROFIT` peaks at bed `26` (`4,770.87`, against
+     `3,511.08` at the cap — a standalone gain of `1,259.79`); marginal cost first
+     reaches price at bed `27` (`2,097.81` against `2,094`); profit then falls
+     every bed, `4,767.06` at 27 to `4,060.35` at 31. Mesclun: peak at bed `37`
+     (`9,067.15` against `8,077.81` at the cap, gain `989.34`); marginal cost first
+     reaches price at bed `38` (`2,704.73` against `2,700`); profit falls to
+     `8,652.03` at bed 42. Five beds are shown after each peak; the required
+     minimum is 3.
+  4. *Tie to the shadow prices.* Standalone `MARG_COST` of bed 21 (carrots) and
+     bed 31 (mesclun) is `1,741.51` and `2,453.53`, equal to `NEXT_MC` in the
+     shadow-price block — as expected where the crop's own hours already exceed
+     `FARMER_HRS`.
+
+  These are standalone figures: they ignore the 64-bed total and the other
+  crops, so they are not a recommendation to exceed a cap. — PASS outside Excel.
+  Outstanding: open in Excel and confirm the block recalculates to the same
+  figures without a repair prompt.
