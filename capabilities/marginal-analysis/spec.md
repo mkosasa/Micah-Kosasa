@@ -14,7 +14,9 @@ built_with: "Claude Code, from this file"
 Cross-validation reference (Farm Profit Lab):
 `https://adamwstauffer.github.io/ai-lms/farmlab.html`.
 Every input below traces to the case scenario; the labor formula and the two
-labor conventions are stated on the Stage 2 page.
+labor conventions are stated on the Stage 2 page. Shadow prices (added after the
+Stage 2 build) trace to the Stage 3 page:
+`https://adamwstauffer.github.io/ai-lms/case-perfect-competition-stage3.html`.
 
 ## Purpose
 This model supports one decision: how many beds to plant of tomatoes, carrots,
@@ -23,8 +25,9 @@ labor requirements, and bed caps, plus a fixed labor supply (the farmer's own
 720 field hours and up to four temporary workers). It must report the integer
 bed allocation that maximizes season profit, the season profit and its cost
 breakdown at that allocation, which constraint stops the allocation where it
-does, and — for each crop analyzed on its own — the bed count at which price
-meets marginal cost.
+does, what one more bed of a capped crop would add to profit (its shadow price),
+and — for each crop analyzed on its own — the bed count at which price meets
+marginal cost.
 
 ## Definitions
 - **P&L** — the season profit expression
@@ -41,6 +44,16 @@ meets marginal cost.
 - **TVC(c, q)** — total variable cost of `q` beds of crop `c`:
   `FERT_COST(c, q) + LABOR_COST_SA(c, q)`. Excludes `FIXED_COSTS`.
 - **Marginal cost of the q-th bed** — `TVC(c, q) - TVC(c, q - 1)`.
+- **Farm-level marginal cost of the next bed** — for crop `c` at the current
+  allocation, the fertilizer plus the labor cost of adding bed `q(c) + 1` to the
+  whole farm, with the extra hours priced on top of `TOTAL_LABOR_HRS`
+  (farmer hours first, then temporary). It differs from the standalone marginal
+  cost above, which prices `c`'s hours as if `c` were the only crop.
+- **Shadow price** — of a binding constraint, the increase in `PROFIT` from
+  relaxing it by one unit with everything else held. Here it is a discrete
+  one-bed step, not a continuous LP dual. For a crop's `MAX_BEDS(c)` cap it is
+  `PRICE(c)` minus the farm-level marginal cost of the next bed. A non-binding
+  constraint has shadow price 0.
 - **BLENDED_RATE** — `TOTAL_LABOR_COST / TOTAL_LABOR_HRS`, a single farm-level
   dollars-per-hour figure at the current allocation.
 - **Interior optimum** — no constraint binds: every crop's marginal profit has
@@ -128,6 +141,17 @@ One workbook. Sheets / regions, in this order:
 - **Worked example** — the fixed reconciliation table below, recomputed by the
   live formulas at `q = (5, 5, 5)`.
 - **Summary** — the solved allocation and every named output in one place.
+  Below the solved-allocation figures, a **shadow-price block**:
+  - one row per crop — `q(c)`, `MAX_BEDS(c)`, whether the cap binds, the extra
+    labor hours and extra labor cost of bed `q(c) + 1`, the farm-level marginal
+    cost of that bed, `PRICE(c)`, `PRICE(c)` minus that cost, whether one more
+    bed is feasible, and `SHADOW_PRICE(c)`;
+  - one row each for the slack on the 64-bed total, the temporary-hour ceiling,
+    and the implied temporary-worker count (limit, used, slack, binding?,
+    shadow price);
+  - one tie-out row (farmer-first labor cost against `TOTAL_LABOR_COST`).
+  The three `SHADOW_PRICE(c)` cells are named ranges (`SHADOW_PRICE_TOM`,
+  `SHADOW_PRICE_CAR`, `SHADOW_PRICE_MES`).
 
 ## Calculation logic
 Named-range notation, never cell addresses. For crop `c` at that crop's own bed
@@ -181,6 +205,41 @@ coincide; where they differ, both are reported so the dip stays visible.
 tie-out checks. `MARGIN(c)` is a season total, variable margin only; it carries
 no share of `FIXED_COSTS`.
 
+### Shadow prices at the current allocation
+For crop `c` at its current `q(c)`. `LABOR_HRS(c, q(c) + 1)` is computed inline
+from the labor formula above — the per-crop tables stop at `MAX_BEDS(c)`, so a
+table lookup would fail for a crop sitting at its cap.
+
+    LABOR_COST_AT(H)    = MIN(H, FARMER_HRS) x FARMER_RATE
+                        + MAX(0, H - FARMER_HRS) x TEMP_WORKER_RATE
+    NEXT_LABOR_HRS(c)   = LABOR_HRS(c, q(c) + 1) - LABOR_HRS(c, q(c))
+    NEXT_LABOR_COST(c)  = LABOR_COST_AT(TOTAL_LABOR_HRS + NEXT_LABOR_HRS(c))
+                        - LABOR_COST_AT(TOTAL_LABOR_HRS)
+    NEXT_MC(c)          = FERT_BED(c) + NEXT_LABOR_COST(c)
+    NEXT_MARGIN(c)      = PRICE(c) - NEXT_MC(c)
+    CAP_BINDING(c)      = q(c) >= MAX_BEDS(c)
+    NEXT_FEASIBLE(c)    = q(TOM) + q(CAR) + q(MES) + 1 <= TOTAL_BEDS
+                          AND TOTAL_LABOR_HRS + NEXT_LABOR_HRS(c) <= LABOR_HRS_CAP
+    SHADOW_PRICE(c)     = IF(CAP_BINDING(c) AND NEXT_FEASIBLE(c), MAX(0, NEXT_MARGIN(c)), 0)
+
+`NEXT_MARGIN(c)` is reported for every crop, including one whose cap does not
+bind — it can be negative, which is how a crop that stops short of its cap shows
+why. Only a crop at its cap can have a non-zero `SHADOW_PRICE(c)`.
+
+Slack rows, at the current allocation (limit, used, slack = limit - used,
+binding = slack <= 0):
+
+    TOTAL_BEDS        limit TOTAL_BEDS                          used q(TOM) + q(CAR) + q(MES)
+    Temp-labor hours  limit TEMP_WORKER_MAX x TEMP_WORKER_HRS   used TEMP_LABOR_HRS
+    Temp workers      limit TEMP_WORKER_MAX                     used TEMP_LABOR_HRS / TEMP_WORKER_HRS
+
+The temp-labor-hours and temp-workers rows are the same constraint stated in
+hours and in workers. Shadow price is `0` when slack is positive; when a row is
+binding the cell reports the text `binding - re-solve`, since valuing it needs a
+re-optimization, not a one-bed step.
+
+Tie-out: `LABOR_COST_AT(TOTAL_LABOR_HRS) = TOTAL_LABOR_COST`.
+
 ### Solver setup
     Maximize:      PROFIT
     By changing:   q(TOM), q(CAR), q(MES)
@@ -231,6 +290,29 @@ no share of `FIXED_COSTS`.
 - **Costing order:** variable costs first — fertilizer, then labor at the
   blended rate — then `FIXED_COSTS`.
 
+### Shadow prices
+- **One extra bed, everything else held.** A shadow price here is the profit
+  change from adding one bed of the capped crop, with the other crops' beds
+  fixed. It is not a continuous LP dual, and it does not hold for a second extra
+  bed — each further bed costs more because the `(1 + DIM_PCT(c)) ^ q` factor
+  compounds. Beds are not reallocated from other crops.
+- **Farm-level marginal costing.** The extra hours are priced at the rate of the
+  marginal source: farmer hours first while any remain, then
+  `TEMP_WORKER_RATE`. Not `BLENDED_RATE` (an average, not a marginal cost) and
+  not the standalone `MARG_COST(c, q)` (it prices the crop as if it were alone,
+  charging its hours against the farmer's 720 that the farm has already used).
+  For the case inputs the farmer's hours are fully used at the optimum
+  (`TOTAL_LABOR_HRS > FARMER_HRS`), so every extra hour costs `TEMP_WORKER_RATE`;
+  the formula still handles allocations where they are not.
+- **Not the `Summary` "MARG_COST at q(c)" column.** That column is the
+  standalone marginal cost of the last bed already planted. `PRICE(c)` minus it
+  is the margin on that last bed, not the value of relaxing the cap.
+- **Floors and gates.** `SHADOW_PRICE(c)` is floored at 0 and is 0 unless the cap
+  binds and one more bed is feasible under the 64-bed total and the
+  labor-hour ceiling. No error values; no lookup into a schedule.
+- **Binding total-bed or temp-hour constraint** — reported as the text
+  `binding - re-solve`, not computed.
+
 ### Precision and boundaries
 - **Rates are the exact quotient**, carried at full precision. `34.72` / `17.36`
   are display values; no formula reads a rounded rate.
@@ -280,11 +362,22 @@ Structural:
   `(FARMER_WAGE / 2) / FARMER_HRS` equals `FARMER_RATE`.
 - `SUM(ALLOC_LABOR_COST(c))` equals `TOTAL_LABOR_COST`.
 - `SUM(MARGIN(c))` equals `PROFIT + FIXED_COSTS`.
+- `LABOR_COST_AT(TOTAL_LABOR_HRS)` equals `TOTAL_LABOR_COST` (the tie-out row in
+  the shadow-price block — it validates the farmer-first cost function the
+  shadow prices use).
+- `SHADOW_PRICE(c) >= 0` for every crop, and `> 0` only where `CAP_BINDING(c)`.
+- No error values in the shadow-price block.
 
 Hand check — the `q = 1` exponent guard:
 - `LABOR_HRS(TOM, 1) = 1 x 2.50 x 36 x 1.10 = 99 hours`, exactly. Repeat for each
   crop with its own `DIM_PCT(c)`. A result of `90` (i.e. `x 1.00`) means the
   `(1 + dim%)^q` exponent was dropped — the most common structural defect.
+
+Hand check — the shadow price. For a crop at its cap, recompute `PROFIT` from the
+Inputs formulas with `q(c) + 1` beds of that crop and every other bed count
+unchanged. `PROFIT(q(c) + 1) - PROFIT(q(c))` must equal `NEXT_MARGIN(c)` and, when
+the cap binds and the extra bed is feasible, `SHADOW_PRICE(c)`. This uses the
+profit expression directly, independent of the block's own formulas.
 
 Worked example — the model must reproduce this table at `q = (5, 5, 5)`, an
 arbitrary non-optimal allocation chosen only as a numeric anchor. Figures shown
@@ -341,14 +434,12 @@ the build — they are intentionally not restated here as acceptance criteria.
 - Binding constraint at the optimum — one of: the 64-bed total, the 5,760
   temporary-hour ceiling, a crop's `MAX_BEDS(c)`, or "interior".
 - The tomato marginal-cost-schedule dip — surfaced as a flag, not explained.
-- Shadow prices (added for Stage 3; `Summary` rows 32–45, named
-  `SHADOW_PRICE_TOM`, `SHADOW_PRICE_CAR`, `SHADOW_PRICE_MES`) — for a crop at its
-  `MAX_BEDS(c)`, `PRICE(c)` minus the farm-level marginal cost of bed `q+1`,
-  where the extra hours are priced farmer hours first at `FARMER_RATE`, then
-  `TEMP_WORKER_RATE`; zero when the constraint is not binding. The block also
-  reports slack on the 64-bed total and the temporary-hour ceiling, and a
-  tie-out of the farmer-first labor cost to `TOTAL_LABOR_COST`. Valid for one
-  extra bed only.
+- Shadow prices (added for Stage 3; named `SHADOW_PRICE_TOM`,
+  `SHADOW_PRICE_CAR`, `SHADOW_PRICE_MES`) — `SHADOW_PRICE(c)` for each crop, with
+  `NEXT_LABOR_HRS(c)`, `NEXT_MC(c)`, and `NEXT_MARGIN(c)` alongside; the slack and
+  binding status of the 64-bed total, the temporary-hour ceiling, and the implied
+  temporary-worker count; and the labor-cost tie-out. Valid for one extra bed
+  only.
 
 ## Audit findings
 Added after the model is built. For each check: what was checked, what was
@@ -444,3 +535,33 @@ Solver — is flagged per check.
   rest of the workbook loaded intact. Fixed by emitting the columns in order;
   the generator now also validates column order on every sheet. Corrected
   `model.xlsx` rebuilt.
+- **Shadow-price block (Stage 3 addition).** Added to `Summary` (rows 32–45) by
+  direct OOXML edit after the audit above; no Excel was available. Checked
+  outside Excel:
+  1. *From-scratch profit differential.* `PROFIT` recomputed straight from the
+     spec's inputs with one more bed of a crop (others fixed), minus `PROFIT` at
+     the optimum `(10, 20, 30)`: TOM `-590.72`, CAR `352.49`, MES `246.47` —
+     equal to the block's `PRICE - MC(q+1)` column. `SHADOW_PRICE`: TOM `0` (cap
+     not binding), CAR `352.49`, MES `246.47`.
+  2. *Stored formulas re-evaluated.* The formula text of all 48 new formula cells,
+     read back from the saved file and evaluated against the workbook's cached
+     inputs, reproduces every cached value.
+  3. *Input perturbation.* `PRICE(CAR)` +100 → `SHADOW_PRICE(CAR)` +100;
+     `FERT_BED(MES)` +50 → `SHADOW_PRICE(MES)` −50; `MAX_BEDS(CAR)` 20 → 25 → cap
+     no longer binds, `SHADOW_PRICE(CAR)` 0; `PRICE(MES)` 2,700 → 2,400 →
+     `SHADOW_PRICE(MES)` 0 (marginal cost above price); `TOTAL_BEDS` 64 → 60 →
+     bed slack 0, binding, the extra bed reads BLOCKED, shadow prices 0. Direct
+     inputs only — upstream cached values were held.
+  4. *Nothing else moved.* Every pre-existing cell: 0 formula diffs, 0 value
+     diffs, 0 dropped; named ranges 47 → 50.
+  5. *Stage 3 page.* Shadow prices `$352` (carrots) and `$246` (mesclun), and the
+     tomato marginal cost of bed 11 (`$9,391`), reproduce: `352.49`, `246.47`,
+     `9,390.72`.
+
+  Finding: the existing `Summary` "MARG_COST at q(c)" column (`8,248.59` /
+  `1,688.95` / `2,420.10`) is the standalone marginal cost of the last planted
+  bed. `PRICE` minus it (`551.41` / `405.05` / `279.90`) is that bed's margin, not
+  a shadow price — the shadow price uses the farm-level cost of the *next* bed.
+  — PASS outside Excel. Outstanding: open in Excel (the workbook is set to
+  recalculate on open; the stale `calcChain` was removed so Excel rebuilds it)
+  and confirm the block recalculates to the same figures without a repair prompt.
