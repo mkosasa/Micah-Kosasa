@@ -48,9 +48,28 @@ Canonical file: AGENTS.md. CLAUDE.md points here.
 ## Documentation
 When work changes, update the document that describes it in the same commit.
 A capability's README names the engagements that exercised it — keep that current.
-Log every AI session in prompt-log.md at the repo root: the date, the tool, what
-I asked, what it produced, and what I did with it. See docs/lifecycle.md for how
-an engagement moves from brief to decision.
+See docs/lifecycle.md for how an engagement moves from brief to decision.
+
+## Prompt log — BUS 620 graded work only
+After any substantive session on graded work for BUS 620 (Macro/Micro Economics),
+append an entry to prompt-log.md at the repo root: the date, the tool, what I
+asked for, and what you produced. Facts only. Never write the reflection, never
+fill in what you got wrong, and never assess how I verified your output — those
+are mine.
+- Graded work means the deliverables of a BUS 620 engagement — currently
+  perfect-competition: its brief, capability spec and model, analysis, figures,
+  and decision memo. If a session is not clearly that, do not log it (other
+  courses, work, DPH, resume or bio, skills and routines, general questions).
+  If you are unsure, ask me; if I am not available, do not log it and say so in
+  your report.
+- Substantive means the session created or changed a file, a number, or a
+  decision. Do not log pure questions and answers.
+- One row per session, added at the bottom of the table, above "Errors caught".
+  Never edit or delete existing rows, and never add to "Errors caught" or write
+  any reflection text.
+- In the last column ("What I did with it") write mechanical facts only, such
+  as the branch or PR it was committed to. My decisions and any checking of your
+  work stay mine to write.
 
 ## Scope
 Do the work I asked for. If you notice something worth doing that I did not ask
