@@ -1,4 +1,4 @@
-<!-- Micah's draft is the first commit of this PR, verbatim. Added since: (1) the five bracketed placeholders are filled in [brackets] with cell references; (2) blocks labelled "Model support" (sheet!cell = value) or "Check" (a point to look at) follow the paragraphs they support, all added by Claude; (3) at Micah's request, four factual corrections inside his sentences (cell columns K14:K16, "going up", the workers clause, the Unconstrained tab), listed in the third commit; (4) the unclear variable-costs sentence replaced with Micah's own wording, in the fourth commit. Rephrase or delete the added blocks in your own words. Values are from capabilities/marginal-analysis/model.xlsx on main (blob cc3684e). -->
+<!-- Micah's draft is the first commit of this PR, verbatim. Added since: (1) the five bracketed placeholders are filled in [brackets] with cell references; (2) blocks labelled "Model support" (sheet!cell = value) or "Check" (a point to look at) follow the paragraphs they support, all added by Claude; (3) at Micah's request, four factual corrections inside his sentences (cell columns K14:K16, "going up", the workers clause, the Unconstrained tab), listed in the third commit; (4) the unclear variable-costs sentence replaced with Micah's own wording, in the fourth commit; (5) a paragraph on the shadow prices added in Micah's own words, in the fifth commit. Rephrase or delete the added blocks in your own words. Values are from capabilities/marginal-analysis/model.xlsx on main (blob cc3684e). -->
 
 # Farm Model Analysis
 
@@ -39,10 +39,20 @@ Looking at the constraints, at least from a bed standpoint, we would be able to 
 
 The constraint on the amount of beds is a limiting factor not for tomatoes, but for carrots and mesclun. [With the caps lifted, the best is 26 carrot beds (`Unconstrained!C7`) and 37 mesclun beds (`Unconstrained!D7`), up from 20 and 30.]
 
-> **Model support** — what relaxing a cap is worth:
-> - The first extra carrot bed adds $352.49 (`Summary!K37`); the first extra mesclun bed adds $246.47 (`Summary!K38`); tomatoes $0 (`Summary!K36`). Each is the price minus the marginal cost of the next bed: carrots $2,094 − $1,741.51 (`Summary!G37`), mesclun $2,700 − $2,453.53 (`Summary!G38`).
+> **Model support** — with the caps lifted:
 > - Lifting the caps completely: 26 carrot beds and 37 mesclun beds (`Unconstrained!C7`, `Unconstrained!D7`). The same peaks appear on `MCSchedules` (`E124` = 26, `E147` = 37). The gain is $1,259.79 for carrots (`MCSchedules!E127`) and $989.34 for mesclun (`MCSchedules!E150`), $2,249.13 together.
 > - The slack limits are worth $0: the 64-bed total (4 beds unused, `Optimization!E14`) and the temp-labor hours (1,202.78 unused, `Optimization!E21`).
+
+The shadow costs for carrots are 352.49 and mesclun 246.47. Relaxing the constraints on the bed requirement would allow taking advantage of those restraints and carrots being the priority if only one product could have the bed limit removed.
+
+> **Model support**
+> - Your figures match. Shadow prices (the value of the first extra bed): carrots $352.49 (`Summary!K37`), mesclun $246.47 (`Summary!K38`), tomatoes $0 (`Summary!K36`). Each is the price minus the marginal cost of the next bed: carrots $2,094 − $1,741.51 (`Summary!G37`), mesclun $2,700 − $2,453.53 (`Summary!G38`).
+> - Carrots come first on every comparison. First extra bed: $352.49 against $246.47. The first five extra beds: carrots $352.49, $298.09, $241.77, $183.49, $123.18 (`Unconstrained!I81:I85`) against mesclun $246.47, $212.45, $177.82, $142.58, $106.72 (`Unconstrained!N91:N95`). Removing the cap completely: $1,259.79 for carrots (`MCSchedules!E127`) against $989.34 for mesclun (`MCSchedules!E150`).
+> - The four unused beds (`Optimization!E14`) could all go to carrots with no new land: raising the carrot cap from 20 to 24 adds $1,075.85 (`MCSchedules!K115` minus `MCSchedules!K111`). The same four beds for mesclun would add $779.33 (`MCSchedules!K137` minus `MCSchedules!K133`). The four carrot beds fit the labor limit: 5,596.33 hours against 6,480 (`Inputs!B14`), calculated from `Inputs`; not a workbook cell.
+> - If both caps could be lifted, the best four extra beds would be three carrot beds and one mesclun bed, $1,138.83 (derived from `Unconstrained!I81`, `I82`, `I83` and `N91`).
+> - Only the first bed is worth the full shadow price; each further bed is worth less (carrots $352.49, then $298.09, then $241.77).
+>
+> **Check** — the model and the assignment call these shadow *prices*; your figures are right.
 
 We did not reach the max of 64 total beds, and worker hours was not a limit — that was not a constraint.
 
