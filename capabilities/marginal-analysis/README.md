@@ -23,7 +23,11 @@ changes as more units are committed.
   `SHADOW_PRICE_TOM/CAR/MES`). `MCSchedules` rows 105–152 continue the carrot and
   mesclun standalone schedules past their caps to the profit peak (named outputs
   `XING_UNCAPPED_CAR/MES`) — a what-if display that changes no result. Both
-  additions came after the manual audits and are not yet audited in Excel.
+  additions came after the manual audits; an Excel save of the workbook with the
+  new sheets recalculated with no differences (see the last entry in `spec.md`
+  Audit findings). The workbook also carries the Solver settings from that Excel
+  save, but they are partial (one changing cell, no constraints), so the full
+  integer Solver check is still open.
   `Unconstrained` shows the farm with every limit released (beds and temp
   workers): stop bed per crop, beds and labor against today's limits, profit.
   `FertScenario` (with its grid `FertEnum`) tests a 30% fertilizer discount after

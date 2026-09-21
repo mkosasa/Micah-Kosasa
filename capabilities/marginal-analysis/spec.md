@@ -868,3 +868,30 @@ Solver — is flagged per check.
   Outstanding: open in Excel and confirm the workbook recalculates (including the
   41,181-row grid) to the same figures without a repair prompt. The workbook is
   now about 9.9 MB, most of it the grid.
+- **Excel save and saved Solver settings (owner's manual audit).** Micah opened
+  the workbook in Excel and saved it; the save is recorded as its own commit.
+  1. *Excel recalculation.* The saved file has the same 12 sheets and 58 names as
+     the model built here, and a cell-by-cell comparison found 0 formula / text
+     differences and 0 cached-value differences across all 12 sheets (about 1.0
+     million cells, including the 535,000-cell `FertEnum` grid); every check cell
+     still reads PASS. The workbook was set to recalculate on open, so this settles
+     the "recalculates to the same figures" part of the *Outstanding* notes above
+     for the shadow-price block, the beyond-cap rows, and the three new sheets.
+     Whether Excel showed a repair prompt was not recorded.
+  2. *Saved Solver settings.* Micah's earlier Excel save (PR #15) carries Solver
+     settings, now copied into this workbook exactly as saved (15 hidden names).
+     On `Optimization`: maximize the objective `Optimization!$B$10` (`PROFIT`),
+     GRG Nonlinear, changing cell `Optimization!$B$4` only, **no constraints**,
+     variables assumed non-negative. On `MCSchedules`: an objective of
+     `MCSchedules!$R$7` (an empty cell), same engine, no constraints. The decision
+     cells read `10 / 20 / 30` and `Optimization!B30` reads "solved = enumeration
+     max".
+  3. *What that does and does not show.* These settings are not the setup in
+     "Solver setup" above (three changing cells, nine explicit constraints,
+     integer, two starting points), so they do not complete the two-start Solver
+     check, which remains open. The `MCSchedules`-scoped settings look like a stray
+     Solver open. They are kept as saved; delete or complete them when the Solver
+     check is rerun.
+
+  Outstanding: run Solver with the full setup above from both starting points, and
+  note whether Excel showed a repair prompt.
