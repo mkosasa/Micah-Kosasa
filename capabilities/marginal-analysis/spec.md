@@ -895,4 +895,4 @@ Solver — is flagged per check.
 
   Outstanding: run Solver with the full setup above from both starting points, and
   note whether Excel showed a repair prompt.
-  now about 9.9 MB, most of it the grid. Confirmed
+  
