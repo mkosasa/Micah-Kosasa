@@ -1,4 +1,4 @@
-<!-- Micah's draft is the first commit of this PR, verbatim. Added since: (1) the five bracketed placeholders are filled in [brackets] with cell references; (2) blocks labelled "Model support" (sheet!cell = value) or "Check" (a point to look at) follow the paragraphs they support, all added by Claude; (3) at Micah's request, four factual corrections inside his sentences (cell columns K14:K16, "going up", the workers clause, the Unconstrained tab), listed in the third commit; (4) the unclear variable-costs sentence replaced with Micah's own wording, in the fourth commit; (5) a paragraph on the shadow prices added in Micah's own words, in the fifth commit. Rephrase or delete the added blocks in your own words. Values are from capabilities/marginal-analysis/model.xlsx on main (blob cc3684e). -->
+<!-- Micah's draft is the first commit of this PR, verbatim. Added since: (1) the five bracketed placeholders are filled in [brackets] with cell references; (2) blocks labelled "Model support" (sheet!cell = value) or "Check" (a point to look at) follow the paragraphs they support, all added by Claude; (3) at Micah's request, four factual corrections inside his sentences (cell columns K14:K16, "going up", the workers clause, the Unconstrained tab), listed in the third commit; (4) the unclear variable-costs sentence replaced with Micah's own wording, in the fourth commit; (5) a paragraph on the shadow prices added in Micah's own words, in the fifth commit; (6) the three charts embedded with captions and their file locations, in the sixth commit. Rephrase or delete the added blocks in your own words. Values are from capabilities/marginal-analysis/model.xlsx on main (blob cc3684e). -->
 
 # Farm Model Analysis
 
@@ -23,6 +23,10 @@ Another place to see this is where the profit is constantly rising — rising at
 > - `MCSchedules!K14` (9 beds) = $25,621.36; `MCSchedules!K15` (10 beds) = $26,172.77; `MCSchedules!K16` (11 beds) = $25,582.06.
 > - Profit rises through bed 10 (+$551.41) and drops at bed 11 (−$590.72). These K values are standalone profit before the $20,000 fixed costs.
 > - Column H on the same rows is the marginal cost, which keeps rising: `H15` $8,248.59, `H16` $9,390.72, `H17` $10,687.59.
+>
+> **Figure 1** — Marginal cost of each bed against the price, for each crop on its own; the dotted line marks the beds planted at the solved mix (10 tomato, 20 carrot, 30 mesclun). Tomato marginal cost crosses the $8,800 price between bed 10 ($8,248.59) and bed 11 ($9,390.72). Data: `MCSchedules` (marginal cost column H, price column I) and `Optimization!B4:B6`. File: `analysis/figures/perfect-competition-mc-vs-price.png`
+>
+> ![Marginal cost vs price for each crop, with the beds planted marked](figures/perfect-competition-mc-vs-price.png)
 
 **Which constraints bind, and what relaxing one is worth**
 
@@ -120,6 +124,10 @@ Where this really adds more is when the constraints on beds or labor are not inc
 > - Beds 10 / 30 / 44 = 84 (`F12:F15`); 84 is 20 more than the 64 you have (`F20`).
 > - Labor hours 7,642.34 (`F17`), which is 1,162.34 over the 6,480-hour limit (`F19`; limit at `Inputs!B14`). Temp workers needed: 4.81 (`F18`) against 4 (`Inputs!B13`).
 > - Profit $55,336.48 (`F16`): $10,325.68 more than released without the discount (`G16`) and $12,574.81 more than today's $42,761.66 (`B16`). It is the best of all the bed mixes tested (`FertEnum!S3`), and the best mix is inside the tested range (`FertEnum!Q15` = PASS).
+>
+> **Figure 2** — Tomato marginal cost (top) and cumulative labor hours (bottom) by bed, beds 1 to 12. The dotted line is bed 5, where cumulative hours first pass the farmer's 720 hours (`MCSchedules!B10` = 724.73 hours; `Inputs!B7` = 720); marginal cost then falls from $7,660.86 at bed 5 (`MCSchedules!H10`) to $4,906.28 at bed 6 (`MCSchedules!H11`). File: `analysis/figures/perfect-competition-tomato-mc-and-hours.png`
+>
+> ![Tomato marginal cost and cumulative labor hours by bed](figures/perfect-competition-tomato-mc-and-hours.png)
 
 **Why grow crops that lose money on their own?**
 
@@ -134,6 +142,10 @@ The key thing here is the fixed costs, as seen in cell [`Inputs!B6`], of $20,000
 Here's where one of the greatest values in addressing this fixed cost is: to produce as much of the crop as possible, as long as the marginal cost is lower than the price. Even if overall you are losing money, that slight difference between the marginal cost and the price is helping chip away at the total fixed amount. For a single bed, a high difference is good — but even as that difference between the marginal cost and the price gets smaller and smaller due to diminishing returns, the sum of those differences, at a high number of beds, can take a big chunk out of that fixed cost. That is where it has value and is worth pursuing.
 
 > **Model support** — the shrinking gap between price and marginal cost, bed by bed (`Unconstrained`, "PRICE - MC" columns): carrots $1,120.15 at bed 1 (`I61`), $405.05 at bed 20 (`I80`), $60.77 at bed 26 (`I86`); mesclun $1,028.98 (`N61`), $279.90 at bed 30 (`N90`), $33.07 at bed 37 (`N97`); tomatoes $6,201.25 at bed 1 (`D61`), $551.41 at bed 10 (`D70`), then −$590.72 at bed 11 (`D71`). Together the three crops' variable margins ($62,761.66, `CostStructure!B16:B18`) are about 3.1 times the $20,000 fixed cost (`Inputs!B6`).
+>
+> **Figure 3** — Each crop's variable margin ($33,143.42 tomatoes, $13,682.27 carrots, $15,935.98 mesclun; `CostStructure!B16:B18`), the $20,000 fixed costs (`CostStructure!B19`), and the season profit that remains at 10 / 20 / 30 beds, $42,761.66 (`CostStructure!B21`). File: `analysis/figures/perfect-competition-margin-vs-fixed-costs.png`
+>
+> ![Variable margin by crop, fixed costs and season profit](figures/perfect-competition-margin-vs-fixed-costs.png)
 
 **Regarding my Stage One hypothesis**
 
