@@ -29,7 +29,10 @@ does, what one more bed of a capped crop would add to profit (its shadow price),
 and — for each crop analyzed on its own — the bed count at which price meets
 marginal cost. For the two crops that sit at their caps, it also shows where each
 one's own standalone profit would peak if the cap were lifted (a what-if display;
-the cap still binds).
+the cap still binds). Two further what-ifs each get their own tabs: the farm with
+every limit released (beds, temporary workers) to see the maximum-profit point
+and how it compares with today's limits, and a fertilizer discount after a set
+number of beds farm-wide, under today's limits and with limits released.
 
 ## Definitions
 - **P&L** — the season profit expression
@@ -63,6 +66,20 @@ the cap still binds).
 - **XING_UNCAPPED(c)** — the bed count that maximizes `SA_PROFIT(c, q)` over the
   capped schedule and its continuation together: the crop's standalone
   profit-maximizing bed count if `MAX_BEDS(c)` did not apply.
+- **Today's limits** — the constraints the model is built with: `MAX_BEDS(c)` per
+  crop, `TOTAL_BEDS` on the farm, and `TEMP_WORKER_MAX` temporary workers (the
+  temporary-hour ceiling).
+- **Limits released** — none of those three. Extra temporary hours cost
+  `TEMP_WORKER_RATE`, the same rate as today (no premium); `FARMER_HRS` still come
+  first at `FARMER_RATE`. Prices, fertilizer costs, labor requirements,
+  diminishing returns, and `FIXED_COSTS` are unchanged.
+- **Stop bed** of crop `c`, limits released — the last bed whose farm-level
+  marginal cost is below `PRICE(c)`. Beyond it every extra bed loses money. This
+  is the maximum-*profit* rule, not maximum output.
+- **Fertilizer discount** — fertilizer on each bed after the first
+  `FERT_DISC_BEDS` beds farm-wide costs `(1 - FERT_DISC_PCT)` as much. Beds are
+  counted across all crops together, and the discount lands on the
+  highest-fertilizer-cost beds first.
 - **BLENDED_RATE** — `TOTAL_LABOR_COST / TOTAL_LABOR_HRS`, a single farm-level
   dollars-per-hour figure at the current allocation.
 - **Interior optimum** — no constraint binds: every crop's marginal profit has
@@ -128,6 +145,15 @@ which put season profit `$6.49` above the published check. See Audit findings.
 |---|---|---|
 | `q(TOM)`, `q(CAR)`, `q(MES)` | beds (integer) | Solver output |
 
+### Scenario inputs (fertilizer what-if)
+| Name | Value | Unit | Source |
+|---|---|---|---|
+| `FERT_DISC_BEDS` | 40 | beds, farm-wide | Owner's what-if — the beds that pay full fertilizer price |
+| `FERT_DISC_PCT` | 0.30 | fraction | Owner's what-if — discount on the fertilizer of each bed after that |
+
+These two are entered on the `FertScenario` sheet, not `Inputs`, because only the
+scenario sheets read them; the base model never does.
+
 ## Structure
 One workbook. Sheets / regions, in this order:
 
@@ -168,6 +194,23 @@ One workbook. Sheets / regions, in this order:
   - one tie-out row (farmer-first labor cost against `TOTAL_LABOR_COST`).
   The three `SHADOW_PRICE(c)` cells are named ranges (`SHADOW_PRICE_TOM`,
   `SHADOW_PRICE_CAR`, `SHADOW_PRICE_MES`).
+- **Unconstrained** — the farm with every limit released: a summary (stop bed per
+  crop; beds against `TOTAL_BEDS`, against beds planted today, and against the sum
+  of the caps; labor hours against `LABOR_HRS_CAP` and against today's plan; temp
+  workers needed; profit against today's), a neighbor check, live PASS / FAIL
+  checks, and a farm-level marginal-cost schedule for beds 0 to 55 per crop with
+  the stop bed marked.
+- **FertScenario** — the fertilizer what-if: the two scenario inputs; results with
+  and without the discount under today's limits and with limits released (mix,
+  profit, labor hours, temp workers, over / under against the labor and bed
+  limits, discount applied); the marginal cost of the last and next bed before and
+  after the discount; a sensitivity row for a carrots-first discount order;
+  PASS / FAIL checks; and discounted marginal-cost schedules for beds 0 to 55.
+- **FertEnum** — the enumeration grid behind FertScenario: every
+  `(q(TOM), q(CAR), q(MES))` with `q(TOM)` 0–20, `q(CAR)` 0–36, `q(MES)` 0–52
+  (41,181 rows), profit with and without the discount, a flag for combinations
+  inside today's limits, and the four readouts (today's limits / limits released,
+  each with no discount / discount).
 
 ## Calculation logic
 Named-range notation, never cell addresses. For crop `c` at that crop's own bed
@@ -282,6 +325,76 @@ re-optimization, not a one-bed step.
 
 Tie-out: `LABOR_COST_AT(TOTAL_LABOR_HRS) = TOTAL_LABOR_COST`.
 
+### Limits released (Unconstrained sheet)
+For each crop `c`, at every bed `q = 1 .. 55`:
+
+    MC_FARM(c, q)  = FERT_BED(c) + (LABOR_HRS(c, q) - LABOR_HRS(c, q - 1)) x TEMP_WORKER_RATE
+    STOP(c)        = the largest q in 1 .. 55 with MC_FARM(c, q) < PRICE(c)      (0 if none)
+    UNCON_Q(c)     = STOP(c)
+
+    UNCON_HRS      = SUM over c of LABOR_HRS(c, STOP(c))
+    UNCON_PROFIT   = SUM(STOP(c) x PRICE(c)) - SUM(STOP(c) x FERT_BED(c))
+                     - LABOR_COST_AT(UNCON_HRS) - FIXED_COSTS
+
+Why each crop can be solved on its own: when `UNCON_HRS >= FARMER_HRS`,
+`LABOR_COST_AT(H)` equals `FARMER_HRS x FARMER_RATE + (H - FARMER_HRS) x
+TEMP_WORKER_RATE`, which is affine in `H`. Profit is then a sum of one term per
+crop, and every extra labor hour costs `TEMP_WORKER_RATE`. `MC_FARM` differs from
+the standalone `MARG_COST` on `MCSchedules` (which gives each crop the farmer's
+hours first) at early beds and agrees at and past the stop bed, so the stop beds
+equal the standalone peaks: `STOP(TOM) = XING(TOM)` (when below its cap),
+`STOP(CAR) = XING_UNCAPPED(CAR)`, `STOP(MES) = XING_UNCAPPED(MES)`. Do not add the
+three standalone `SA_PROFIT` values: each charges its own first `FARMER_HRS` at
+`FARMER_RATE`, while the farm pays that once.
+
+Comparisons reported:
+
+    beds:    SUM(UNCON_Q) vs TOTAL_BEDS, vs q(TOM)+q(CAR)+q(MES), vs SUM of MAX_BEDS(c)
+    labor:   UNCON_HRS vs LABOR_HRS_CAP                              (over (+) / under (-))
+             MAX(0, UNCON_HRS - FARMER_HRS) vs TEMP_WORKER_MAX x TEMP_WORKER_HRS
+             temp workers = MAX(0, UNCON_HRS - FARMER_HRS) / TEMP_WORKER_HRS  vs TEMP_WORKER_MAX
+             UNCON_HRS vs TOTAL_LABOR_HRS                            (today's plan)
+    profit:  UNCON_PROFIT vs PROFIT
+
+Neighbor check: recompute profit from the full cost formulas at `UNCON_Q` and at
+each single-bed neighbor (one crop +1 or -1); no neighbor may beat the optimum.
+
+### Fertilizer discount (FertScenario and FertEnum sheets)
+For an allocation with `N = q(TOM) + q(CAR) + q(MES)`:
+
+    OVER         = MAX(0, N - FERT_DISC_BEDS)
+    FERT_DISC    = FERT_DISC_PCT x ( FERT_BED(TOM) x MIN(q(TOM), OVER)
+                                   + FERT_BED(MES) x MIN(q(MES), MAX(0, OVER - q(TOM)))
+                                   + FERT_BED(CAR) x MIN(q(CAR), MAX(0, OVER - q(TOM) - q(MES))) )
+    PROFIT_DISC  = PROFIT + FERT_DISC
+
+The order TOM, MES, CAR puts the discount on the highest-fertilizer-cost beds
+first; it is exact only while `FERT_BED(TOM) >= FERT_BED(MES) >= FERT_BED(CAR)`
+(a live check).
+
+Enumeration (FertEnum): every integer allocation on `q(TOM)` 0–20, `q(CAR)` 0–36,
+`q(MES)` 0–52. Per row: hours, `LABOR_COST_AT(hours)`, revenue minus fertilizer,
+`FERT_DISC`, `PROFIT` and `PROFIT_DISC`, and a flag that is 1 when the row is inside
+today's limits (`q(TOM) <= MAX_BEDS(TOM)`, `q(CAR) <= MAX_BEDS(CAR)`,
+`q(MES) <= MAX_BEDS(MES)`, `N <= TOTAL_BEDS`, temporary hours at or below the
+ceiling). Four readouts: the row maximizing `PROFIT` and `PROFIT_DISC` over (a) the
+flagged rows (today's limits) and (b) all rows (limits released). The grid's axes
+extend past every released optimum, and a live check requires each released
+optimum to sit strictly inside the grid.
+
+Marginal cost by bed comes from profit differences at each view's discounted
+optimum, with and without the discount (`e_c` is one bed of crop `c`):
+
+    MC_LAST(c) = PRICE(c) - ( PROFIT(q) - PROFIT(q - e_c) )
+    MC_NEXT(c) = PRICE(c) - ( PROFIT(q + e_c) - PROFIT(q) )
+
+Schedules with the discount hold the other two crops at the view's solved
+allocation:
+
+    MC_DISC(c, q) = MC_FARM(c, q) - ( FERT_DISC(c at q) - FERT_DISC(c at q - 1) )
+
+and agree with the profit-difference values at the solved allocation.
+
 ### Solver setup
     Maximize:      PROFIT
     By changing:   q(TOM), q(CAR), q(MES)
@@ -374,6 +487,33 @@ Tie-out: `LABOR_COST_AT(TOTAL_LABOR_HRS) = TOTAL_LABOR_COST`.
 - **Placement.** Appended below the existing schedule blocks, so no existing row
   moves and every existing reference, named range and check is unchanged.
 
+### Limits released and the fertilizer scenario
+- **What-ifs, display only.** Nothing in the base model reads the three new
+  sheets. `Enumeration`, the Solver setup, `Summary`, `Checks`, and the shadow
+  prices are unchanged.
+- **Released means released everywhere** — per-crop caps, the farm bed total, and
+  the temporary-worker limit — with extra temporary hours at the same
+  `TEMP_WORKER_RATE`. Hiring past four workers may cost more in practice; a
+  premium would lower the released result.
+- **Maximum profit, not maximum output.** Past the stop bed each extra bed raises
+  output and loses money.
+- **"After 40 beds" counts the whole farm** (the owner's choice), not each crop's
+  own bed count. The per-crop reading was not built: no crop's best bed count
+  reaches 40 (10 / 26 / 37 released), so it would change nothing.
+- **Discount order and its side effect.** The discount sits on the
+  highest-fertilizer-cost beds, so while `OVER <= q(TOM) + q(MES)` one more bed of
+  *any* crop pulls another top-cost bed into the discounted range: every crop's
+  marginal cost falls by `FERT_DISC_PCT x FERT_BED(TOM)` (30% of 880 = 264), even
+  carrots, whose own fertilizer is 440. A different order gives different
+  numbers; the `FertScenario` sensitivity row shows the mix under a carrots-first
+  order.
+- **Grid bounds are not a constraint.** The FertEnum axes are wide enough that
+  every released optimum sits inside them; the live interior check fails if a
+  future input change pushes one to an edge, and the axes must then be widened.
+- **Labor.** The released mixes are compared with `LABOR_HRS_CAP` (today's labor
+  limit) and with the labor today's plan uses; a positive over / under figure means
+  the released plan needs more labor than today's limit allows.
+
 ### Precision and boundaries
 - **Rates are the exact quotient**, carried at full precision. `34.72` / `17.36`
   are display values; no formula reads a rounded rate.
@@ -433,6 +573,22 @@ Structural:
   `SA_PROFIT` is highest at `XING_UNCAPPED(c)` and lower at the next bed; at least
   3 beds are shown after the peak (a live PASS / FAIL cell); and `XING(c)`,
   `XING_FIRST(c)`, `Summary` and `Checks` are unchanged by it.
+- Limits released (`Unconstrained`), as live PASS / FAIL cells: total hours
+  `>= FARMER_HRS`; at least 3 beds shown after each stop bed; the next bed's
+  marginal cost at or above price for every crop; no single-bed neighbor beats the
+  optimum and both profit routes agree; the stop beds agree with `XING(TOM)`,
+  `XING_UNCAPPED(CAR)`, `XING_UNCAPPED(MES)`; and the result equals the FertEnum
+  limits-released, no-discount readout.
+- Fertilizer scenario (`FertScenario`, `FertEnum`), as live PASS / FAIL cells: the
+  today's-limits, no-discount readout reproduces the model (mix, `PROFIT`, the
+  `Enumeration` maximum); the limits-released, no-discount readout reproduces
+  `Unconstrained`; the released optima sit strictly inside the grid; the grid has
+  every combination; the fertilizer cost order holds; the discounted schedules
+  agree with the profit-difference marginal costs; and discounted profit is never
+  below undiscounted profit at the same mix.
+- The three new sheets change nothing that existed: the original sheets are
+  byte-identical, `Checks` still reads 31 PASS, `XING`, `PROFIT`, and the shadow
+  prices are unchanged.
 
 Hand check — the `q = 1` exponent guard:
 - `LABOR_HRS(TOM, 1) = 1 x 2.50 x 36 x 1.10 = 99 hours`, exactly. Repeat for each
@@ -510,6 +666,17 @@ the build — they are intentionally not restated here as acceptance criteria.
   `XING_UNCAPPED_MES`) — `XING_UNCAPPED(c)`, the standalone `SA_PROFIT` at the peak
   and at the cap, the gain from lifting the cap, and the beds shown after the
   peak. A standalone what-if, not a recommendation to exceed a cap.
+- Limits released (`Unconstrained`; named `UNCON_Q_TOM`, `UNCON_Q_CAR`,
+  `UNCON_Q_MES`, `UNCON_PROFIT`) — the stop bed per crop and in total; the
+  comparisons with `TOTAL_BEDS`, beds planted today, and the sum of the caps;
+  labor hours required against `LABOR_HRS_CAP` (over / under), against the
+  temporary-hour ceiling, against `TEMP_WORKER_MAX`, and against today's plan;
+  profit against today's.
+- Fertilizer scenario (`FertScenario`; inputs `FERT_DISC_BEDS`, `FERT_DISC_PCT`) —
+  the four optima (today's limits and limits released, each with and without the
+  discount) with mix, profit, labor hours, temp workers, and over / under against
+  the labor and bed limits; the discount applied; the marginal cost of the last and
+  next bed before and after the discount; and a carrots-first sensitivity.
 
 ## Audit findings
 Added after the model is built. For each check: what was checked, what was
@@ -665,3 +832,39 @@ Solver — is flagged per check.
   crops, so they are not a recommendation to exceed a cap. — PASS outside Excel.
   Outstanding: open in Excel and confirm the block recalculates to the same
   figures without a repair prompt.
+- **Limits-released and fertilizer-scenario sheets.** Added `Unconstrained`,
+  `FertScenario`, and `FertEnum` by direct OOXML edit; no Excel was available.
+  Checked outside Excel:
+  1. *Nothing else moved.* All 9 original sheet parts, `sharedStrings.xml`, and
+     `styles.xml` are byte-identical to the prior file; only `workbook.xml`, the
+     content types, the relationships, and `app.xml` changed to register the new
+     sheets and six new names (52 → 58, alphabetical).
+  2. *Independent recompute.* Every one of the 41,181 grid rows (hours, profit,
+     discount, profit with discount, feasibility flag) matches from-scratch code
+     (largest gap 0). The four readouts equal an independent brute force, and a
+     wider search (`q(TOM)` < 26, `q(CAR)` < 48, `q(MES)` < 70) returns the same
+     released optima. The 2,016 stored formulas on the two small sheets and the
+     readouts re-evaluate to their cached values; the 12 last / next-bed
+     marginal-cost cells and the 330 discounted schedule cells match profit
+     differences.
+  3. *Results.*
+
+     | | Today's limits | Limits released |
+     |---|---|---|
+     | No discount | 10 / 20 / 30, 60 beds, `42,761.66` (reproduces the model) | 10 / 26 / 37, 73 beds, `45,010.80` |
+     | Discount, 30% after 40 beds | 10 / 20 / 30, `48,041.66` (`+5,280`) | 10 / 30 / 44, 84 beds, `55,336.48` (`+10,325.68`) |
+
+  4. *Labor and beds, limits released, no discount.* 6,453.11 hours against 6,480
+     available: `26.89` hours **under** (3.981 of 4 temporary workers), and
+     `+1,175.90` hours over today's plan; `+9` beds over `TOTAL_BEDS`, `+13` over the
+     60 planted, `+3` over the sum of the caps; `+2,249.13` profit. Labor was not
+     what stopped today's plan (`MAX_BEDS` caps on carrots and mesclun did). With
+     the discount the released mix needs 7,642.34 hours — `1,162.34` **over** the
+     limit (4.81 workers) — and 84 beds, `+20` over `TOTAL_BEDS`.
+  5. *Sensitivity.* With the discount on carrot beds first instead, the same mixes
+     earn `45,401.66` (today's limits) and `51,376.48` (released), against
+     `48,041.66` and `55,336.48`.
+
+  Outstanding: open in Excel and confirm the workbook recalculates (including the
+  41,181-row grid) to the same figures without a repair prompt. The workbook is
+  now about 9.9 MB, most of it the grid.

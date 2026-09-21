@@ -12,9 +12,9 @@ changes as more units are committed.
   supply, the per-crop crop table, the calculation logic in named-range
   notation, the conventions, and the validation rules the built model must pass.
 - `README.md` — this file.
-- `model.xlsx` — the Solver workbook, built from `spec.md` (9 sheets: Inputs,
+- `model.xlsx` — the Solver workbook, built from `spec.md` (12 sheets: Inputs,
   CropEconomics, MCSchedules, CostStructure, Enumeration, Optimization,
-  WorkedExample, Checks, Summary). Every input is a named range; every calculated
+  WorkedExample, Checks, Summary, Unconstrained, FertScenario, FertEnum). Every input is a named range; every calculated
   cell is a formula; the Checks sheet computes the validation rules as live
   PASS/FAIL flags. Built by Claude Code without Excel available, so cell values
   are cached and `fullCalcOnLoad` is set. The manual audits (the checks that
@@ -24,6 +24,11 @@ changes as more units are committed.
   mesclun standalone schedules past their caps to the profit peak (named outputs
   `XING_UNCAPPED_CAR/MES`) — a what-if display that changes no result. Both
   additions came after the manual audits and are not yet audited in Excel.
+  `Unconstrained` shows the farm with every limit released (beds and temp
+  workers): stop bed per crop, beds and labor against today's limits, profit.
+  `FertScenario` (with its grid `FertEnum`) tests a 30% fertilizer discount after
+  40 beds farm-wide, under today's limits and with limits released. Both are
+  what-ifs that change no result; `model.xlsx` is now about 9.9 MB, mostly the grid.
 
 ## Engagements
 
