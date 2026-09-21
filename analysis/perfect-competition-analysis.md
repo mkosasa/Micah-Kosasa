@@ -1,4 +1,4 @@
-<!-- Micah's draft is the first commit of this PR, verbatim. Added since: (1) the five bracketed placeholders are filled in [brackets] with cell references; (2) blocks labelled "Model support" (sheet!cell = value) or "Check" (a point to look at) follow the paragraphs they support, all added by Claude; (3) at Micah's request, four factual corrections inside his sentences (cell columns K14:K16, "going up", the workers clause, the Unconstrained tab), listed in the third commit. Rephrase or delete the added blocks in your own words. Values are from capabilities/marginal-analysis/model.xlsx on main (blob cc3684e). -->
+<!-- Micah's draft is the first commit of this PR, verbatim. Added since: (1) the five bracketed placeholders are filled in [brackets] with cell references; (2) blocks labelled "Model support" (sheet!cell = value) or "Check" (a point to look at) follow the paragraphs they support, all added by Claude; (3) at Micah's request, four factual corrections inside his sentences (cell columns K14:K16, "going up", the workers clause, the Unconstrained tab), listed in the third commit; (4) the unclear variable-costs sentence replaced with Micah's own wording, in the fourth commit. Rephrase or delete the added blocks in your own words. Values are from capabilities/marginal-analysis/model.xlsx on main (blob cc3684e). -->
 
 # Farm Model Analysis
 
@@ -113,11 +113,11 @@ Where this really adds more is when the constraints on beds or labor are not inc
 
 **Why grow crops that lose money on their own?**
 
-The key thing here is the fixed costs, as seen in cell [`Inputs!B6`], of $20,000. That has to be covered one way or another. This coverage of that fixed cost is lessened with a larger total amount of plants being planted — that makes a big difference in keeping the costs, so they exceed the variable costs. But that fixed cost is paid anyway. So a crop that might lose money on its own, when contributing to paying off that fixed cost, can still be of value to the overall enterprise.
+The key thing here is the fixed costs, as seen in cell [`Inputs!B6`], of $20,000. That has to be covered one way or another. The fixed costs are spread thinner per a bed. That makes a big difference as long as the variable costs are less than the price and that difference repeated for each bed pays off a portion of the fixed costs. But that fixed cost is paid anyway. So a crop that might lose money on its own, when contributing to paying off that fixed cost, can still be of value to the overall enterprise.
 
-> **Check** — I could not tell what "so they exceed the variable costs" refers to. If you mean revenue exceeds variable costs: revenue is $210,880 (`CostStructure!B15`) against fertilizer $44,000 (`CostStructure!B14`) plus labor $104,118.34 (`CostStructure!B9`) = $148,118.34, leaving $62,761.66 to cover the $20,000 fixed cost (`CostStructure!B19`) and produce $42,761.66 profit (`CostStructure!B21`).
->
-> **Model support**
+> **Model support** — fixed costs are $20,000 (`Inputs!B6`, also `CostStructure!B19`).
+> - Spread per bed (derived as $20,000 ÷ beds; not workbook cells): about $333.33 a bed at today's 60 beds (`Optimization!B7`), $273.97 at the 73 beds with the limits released (`Unconstrained!E7`), $238.10 at the 84 beds with the fertilizer discount (`FertScenario!F15`).
+> - Price above marginal cost at today's last planted bed: tomatoes $8,800 against $8,248.59, carrots $2,094 against $1,688.95, mesclun $2,700 against $2,420.10 (`Summary!D22:E24`).
 > - Each crop's variable margin (`CostStructure!B16:B18`): tomatoes $33,143.42, carrots $13,682.27, mesclun $15,935.98. Together $62,761.66, about 3.1 times the $20,000 fixed cost.
 > - Each crop's best profit on its own, before fixed costs: tomatoes $26,172.77 at 10 beds (`MCSchedules!K15`), carrots $3,511.08 at 20 (`MCSchedules!K56`), mesclun $8,077.81 at 30 (`MCSchedules!K99`). Against one full $20,000, tomatoes would still cover it (+$6,172.77) but carrots (−$16,488.92) and mesclun (−$11,922.19) would not. That is the "loses money on its own" case.
 
