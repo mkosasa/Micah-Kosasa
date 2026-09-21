@@ -867,4 +867,4 @@ Solver — is flagged per check.
 
   Outstanding: open in Excel and confirm the workbook recalculates (including the
   41,181-row grid) to the same figures without a repair prompt. The workbook is
-  now about 9.9 MB, most of it the grid.
+  now about 9.9 MB, most of it the grid. Confirmed
