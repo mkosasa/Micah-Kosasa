@@ -16,8 +16,14 @@ changes as more units are committed.
   CropEconomics, MCSchedules, CostStructure, Enumeration, Optimization,
   WorkedExample, Checks, Summary, Unconstrained, FertScenario, FertEnum). Every input is a named range; every calculated
   cell is a formula; the Checks sheet computes the validation rules as live
-  PASS/FAIL flags. Built by Claude Code without Excel available, so cell values
-  are cached and `fullCalcOnLoad` is set. The manual audits (the checks that
+  PASS/FAIL flags. Built by Claude Code without Excel available. A grading
+  review found that the committed file had 67,180 formula cells with no cached
+  value (mostly in the `FertEnum` and `Enumeration` grids) and that
+  `fullCalcOnLoad` was not actually set, despite an earlier version of this
+  sentence claiming both; see the last entry in `spec.md` Audit findings for
+  what was found and how it was fixed. As of that fix, every formula cell has a
+  cached value and `fullCalcOnLoad` is set, so the file opens complete for a
+  reader who does not force a recalculation. The manual audits (the checks that
   needed Excel) were completed by Micah; findings are in `spec.md`. `Summary`
   rows 32–45 hold the Stage 3 shadow-price block (named outputs
   `SHADOW_PRICE_TOM/CAR/MES`). `MCSchedules` rows 105–152 continue the carrot and
