@@ -895,4 +895,41 @@ Solver — is flagged per check.
 
   Outstanding: run Solver with the full setup above from both starting points, and
   note whether Excel showed a repair prompt.
-  
+- **Missing cached values (grading review finding).** A Stage 1.2 grading review
+  found that the committed workbook had 67,180 formula cells with no cached
+  value (`MCSchedules` 160, `Enumeration` 3,945, `Unconstrained` 165, `FertEnum`
+  62,910), and that `calcPr` did not carry `fullCalcOnLoad` despite the README
+  claiming both: the workbook opened blank in those regions for anyone who had
+  not built it. Confirmed independently: 67,180 missing, exact match.
+  1. *Fix.* Outside Excel, recomputed every one of the workbook's 593,258
+     formula cells from the stored formula text (a general evaluator plus a
+     compiled fast path for the two large grids), cross-checked against the
+     526,078 cells that already had a cached value (0 mismatches, 0 evaluation
+     errors, tolerance 1e-6 relative), then patched only the 67,180 missing
+     cells directly in the XML. Every one of them resolves to text, not a
+     number, and Excel had already written the correct `t="str"` attribute and
+     a self-closed empty `<v/>` on each, so the patch simply replaced `<v/>`
+     with the computed text, touching nothing else: no `<f>` tag (explicit or shared),
+     no already-cached value, `sharedStrings.xml`, and `styles.xml` are all
+     byte-identical to the pre-fix file; only `workbook.xml` (for `calcPr`) and
+     the 4 affected sheet parts changed. `calcPr` now carries
+     `fullCalcOnLoad="1"`.
+  2. *Verification.* Re-audited the rebuilt file from scratch: 0 missing values
+     remain (all 12 sheets); package integrity (zip clean, every XML part
+     well-formed, 12 sheets and 58 named ranges unchanged); every formula-cell
+     count per sheet unchanged; every `<f>` tag identical to the pre-fix file,
+     cell by cell. Re-read, fresh, from the written file: `Checks!B36` = "ALL
+     PASS", `C36` = 31; `Summary!K36/K37/K38` = 0 / 352.4948 / 246.4738;
+     `MCSchedules!E124/E147` (`XING_UNCAPPED`) = 26 / 37; `Unconstrained!E20` =
+     45,010.7958; `CostStructure!B21` (`PROFIT`) = 42,761.664682745;
+     `FertEnum!S3` = 55,336.4796: the model's own published figures and every
+     figure the grading review cited, reproduced from the file as committed,
+     not from a build script's memory. PASS. `README.md` corrected in the
+     same commit.
+  3. *Left alone.* The Solver setup (previous entry) is unchanged by this fix
+     and remains partial; the two-start run is still outstanding, in Excel, by
+     the owner. The `Checks` sheet's `SUMPRODUCT(--ISERROR(...))` ranges
+     (`MCSchedules!A1:M110`, `Summary!A1:H30`) predate the beyond-cap rows
+     (`MCSchedules` 111–152) and the shadow-price block (`Summary` 32–45), so
+     those additions sit outside every error sweep (flagged, not widened; that
+     would be a scope change the owner has not asked for).
