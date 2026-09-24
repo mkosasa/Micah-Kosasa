@@ -4,7 +4,8 @@ Allocating a constrained resource across competing uses by comparing the
 marginal contribution of each additional unit committed, where that contribution
 changes as more units are committed.
 
-**Exercised in:** perfect-competition (`docs/briefs/perfect-competition-brief.md`)
+**Exercised in:** perfect-competition (`docs/briefs/perfect-competition-brief.md`,
+`analysis/perfect-competition-analysis.md`)
 
 ## Files
 
