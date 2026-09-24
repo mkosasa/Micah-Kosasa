@@ -1,169 +1,81 @@
-<!-- Micah's draft is the first commit of this PR, verbatim. Added since: (1) the five bracketed placeholders are filled in [brackets] with cell references; (2) blocks labelled "Model support" (sheet!cell = value) or "Check" (a point to look at) follow the paragraphs they support, all added by Claude; (3) at Micah's request, four factual corrections inside his sentences (cell columns K14:K16, "going up", the workers clause, the Unconstrained tab), listed in the third commit; (4) the unclear variable-costs sentence replaced with Micah's own wording, in the fourth commit; (5) a paragraph on the shadow prices added in Micah's own words, in the fifth commit; (6) the three charts embedded with captions and their file locations, in the sixth commit. Rephrase or delete the added blocks in your own words. Values are from capabilities/marginal-analysis/model.xlsx on main (blob cc3684e). -->
-
 # Farm Model Analysis
 
-**Why tomatoes stop at 10 beds when they're the money crop**
+## Result
 
-Tomatoes, while they are the most profitable, particularly at the beginning, with the high diminishing percentage of 10%, the marginal costs catch up fairly quickly. At ten tomato beds, the marginal cost is $8,248.59, compared with a price of $8,800. At eleven beds, it jumps up to $9,390.72, which is above that price of $8,800.
+The profit-maximizing mix is 10 tomato beds, 20 carrot beds and 30 mesclun beds (`Optimization!B4:B6`). That uses 60 of the farm's 64 beds and earns a season profit of $42,761.66 after $20,000 in fixed costs (`CostStructure!B21`). The carrot and mesclun max-bed caps are the only binding limits; tomatoes, the 64-bed total and labor hours all have room to spare. Removing every limit adds only $2,249.13, because diminishing returns shrink each extra bed's contribution quickly.
 
-> **Model support**
-> - Price per bed: tomatoes $8,800 (`Inputs!B21`), carrots $2,094 (`Inputs!C21`), mesclun $2,700 (`Inputs!D21`).
-> - Diminishing-returns rate: tomatoes 10% (`Inputs!B18`), carrots 2.5% (`Inputs!C18`), mesclun 1.25% (`Inputs!D18`).
+## Why tomatoes stop at 10 beds
 
-Refer to cell H15 under MC schedules on the model for the ten-bed marginal cost, and cell H16 under MC schedules for the eleven-bed marginal cost.
+Tomatoes earn the most per bed, especially on the first few beds, but their 10% diminishing-returns rate (`Inputs!B18`) drives marginal cost up quickly. The 10th bed costs $8,248.59 (`MCSchedules!H15`), below the $8,800 price (`Inputs!B21`), so it adds $551.41. The 11th bed costs $9,390.72 (`MCSchedules!H16`), $590.72 above the price, so it loses money (Figure 1).
 
-> **Model support** — your two cell references are correct (on the tomato block of `MCSchedules`, bed number = row − 5):
-> - `MCSchedules!H15` = $8,248.59, the marginal cost of the 10th bed. Price: `MCSchedules!J15` = $8,800 (`Inputs!B21`). The 10th bed still adds $551.41 (`Unconstrained!D70`).
-> - `MCSchedules!H16` = $9,390.72, the 11th bed: $590.72 above the price (`Unconstrained!D71` = −$590.72, also `Summary!I36`).
-> - `MCSchedules!B27` = 10 (best bed count) and `MCSchedules!B28` = 11 (first bed where marginal cost reaches price).
+Profit shows the same turn. It rises from $25,621.36 at 9 beds to $26,172.77 at 10, then falls to $25,582.06 at 11 (`MCSchedules!K14:K16`, before fixed costs). Tomatoes therefore stop at 10 beds even though their cap is 20 (`Inputs!B22`), and relaxing the tomato cap is worth $0 (`Summary!K36`).
 
-Another place to see this is where the profit is constantly rising — rising at nine, then ten, then eleven — you can see it drop. This can be seen in cells K14, K15, and K16 under MC schedules.
+**Figure 1** — Marginal cost of each bed against price, for each crop on its own. The dotted line marks the beds planted in the solved mix (10 tomato, 20 carrot, 30 mesclun). Tomato marginal cost crosses the $8,800 price between bed 10 and bed 11. Data: `MCSchedules` and `Optimization!B4:B6`.
 
-> **Model support** — profit is column K on the tomato rows of `MCSchedules` (bed number = row − 5):
-> - `MCSchedules!K14` (9 beds) = $25,621.36; `MCSchedules!K15` (10 beds) = $26,172.77; `MCSchedules!K16` (11 beds) = $25,582.06.
-> - Profit rises through bed 10 (+$551.41) and drops at bed 11 (−$590.72). These K values are standalone profit before the $20,000 fixed costs.
-> - Column H on the same rows is the marginal cost, which keeps rising: `H15` $8,248.59, `H16` $9,390.72, `H17` $10,687.59.
->
-> **Figure 1** — Marginal cost of each bed against the price, for each crop on its own; the dotted line marks the beds planted at the solved mix (10 tomato, 20 carrot, 30 mesclun). Tomato marginal cost crosses the $8,800 price between bed 10 ($8,248.59) and bed 11 ($9,390.72). Data: `MCSchedules` (marginal cost column H, price column I) and `Optimization!B4:B6`. File: `analysis/figures/perfect-competition-mc-vs-price.png`
->
-> ![Marginal cost vs price for each crop, with the beds planted marked](figures/perfect-competition-mc-vs-price.png)
+![Marginal cost vs price for each crop, with the beds planted marked](figures/perfect-competition-mc-vs-price.png)
 
-**Which constraints bind, and what relaxing one is worth**
+## The dip in tomato marginal cost at bed 6
 
-Tomatoes do not run into this constraint, at least from a bed standpoint — even though it hasn't hit its max of 20, you don't need to, because the profitability goes down.
+Tomato marginal cost rises from $4,317.50 at bed 1 to $7,660.86 at bed 5, then drops to $4,906.28 at bed 6 (`MCSchedules!H6`, `H10`, `H11`; Figure 2). The cause is the labor rate. By bed 5, cumulative labor reaches 724.73 hours (`MCSchedules!B10`), just past my own 720 hours (`Inputs!B7`), so the work shifts from me at $34.72 an hour (`Inputs!B9`) to temporary workers at $17.36 an hour (`Inputs!B12`). Halving the wage resets the marginal-cost curve to a lower starting point.
 
-> **Model support** — tomatoes plant 10 beds (`Optimization!B4`) against a cap of 20 (`Inputs!B22`). Relaxing the tomato cap is worth $0 (`Summary!K36`).
+Without that switch, tomatoes would stop much earlier. If I had more hours of my own, or had to hire a second worker at my rate, every hour would cost $34.72. The 6th bed would then cost about $8,932.55, above the $8,800 price, and tomatoes would stop at 5 beds (derived).
 
-Looking at the constraints, at least from a bed standpoint, we would be able to do four more beds. However, we are limited on our carrots and mesclun, where we have already hit our max beds.
+**Figure 2** — Tomato marginal cost (top) and cumulative labor hours (bottom), beds 1 to 12. The dotted line is bed 5, where cumulative hours first pass my 720 hours; marginal cost then falls from $7,660.86 at bed 5 to $4,906.28 at bed 6. Data: `MCSchedules`, `Inputs!B7`.
 
-> **Model support**
-> - Farm bed total 64 (`Inputs!B5`); beds used 60 (`Optimization!B7`); 4 beds unused (`Optimization!E14`, also `Summary!B7`).
-> - Carrots plant 20 beds (`Optimization!B5`), equal to their cap (`Inputs!C22`); mesclun plant 30 (`Optimization!B6`), equal to their cap (`Inputs!D22`).
-> - The model names the binding limit: "MAX_BEDS cap: CAR MES" (`Optimization!B29`, also `Summary!B26`).
+![Tomato marginal cost and cumulative labor hours by bed](figures/perfect-competition-tomato-mc-and-hours.png)
 
-The constraint on the amount of beds is a limiting factor not for tomatoes, but for carrots and mesclun. [With the caps lifted, the best is 26 carrot beds (`Unconstrained!C7`) and 37 mesclun beds (`Unconstrained!D7`), up from 20 and 30.]
+## Binding constraints and shadow prices
 
-> **Model support** — with the caps lifted:
-> - Lifting the caps completely: 26 carrot beds and 37 mesclun beds (`Unconstrained!C7`, `Unconstrained!D7`). The same peaks appear on `MCSchedules` (`E124` = 26, `E147` = 37). The gain is $1,259.79 for carrots (`MCSchedules!E127`) and $989.34 for mesclun (`MCSchedules!E150`), $2,249.13 together.
-> - The slack limits are worth $0: the 64-bed total (4 beds unused, `Optimization!E14`) and the temp-labor hours (1,202.78 unused, `Optimization!E21`).
+Carrots (20 beds) and mesclun (30 beds) are both planted to their caps (`Inputs!C22`, `Inputs!D22`), and the model names those caps as the binding limit (`Optimization!B29`). The other limits have slack:
 
-The shadow costs for carrots are 352.49 and mesclun 246.47. Relaxing the constraints on the bed requirement would allow taking advantage of those restraints and carrots being the priority if only one product could have the bed limit removed.
+- **Beds:** 60 of 64 used, 4 unused (`Optimization!E14`).
+- **Labor:** 5,277.22 of 6,480 hours used, 1,202.78 unused (`Optimization!E22`). Temporary labor equals 3.16 of the 4 available workers (`Summary!B18`).
 
-> **Model support**
-> - Your figures match. Shadow prices (the value of the first extra bed): carrots $352.49 (`Summary!K37`), mesclun $246.47 (`Summary!K38`), tomatoes $0 (`Summary!K36`). Each is the price minus the marginal cost of the next bed: carrots $2,094 − $1,741.51 (`Summary!G37`), mesclun $2,700 − $2,453.53 (`Summary!G38`).
-> - Carrots come first on every comparison. First extra bed: $352.49 against $246.47. The first five extra beds: carrots $352.49, $298.09, $241.77, $183.49, $123.18 (`Unconstrained!I81:I85`) against mesclun $246.47, $212.45, $177.82, $142.58, $106.72 (`Unconstrained!N91:N95`). Removing the cap completely: $1,259.79 for carrots (`MCSchedules!E127`) against $989.34 for mesclun (`MCSchedules!E150`).
-> - The four unused beds (`Optimization!E14`) could all go to carrots with no new land: raising the carrot cap from 20 to 24 adds $1,075.85 (`MCSchedules!K115` minus `MCSchedules!K111`). The same four beds for mesclun would add $779.33 (`MCSchedules!K137` minus `MCSchedules!K133`). The four carrot beds fit the labor limit: 5,596.33 hours against 6,480 (`Inputs!B14`), calculated from `Inputs`; not a workbook cell.
-> - If both caps could be lifted, the best four extra beds would be three carrot beds and one mesclun bed, $1,138.83 (derived from `Unconstrained!I81`, `I82`, `I83` and `N91`).
-> - Only the first bed is worth the full shadow price; each further bed is worth less (carrots $352.49, then $298.09, then $241.77).
->
-> **Check** — the model and the assignment call these shadow *prices*; your figures are right.
+The shadow prices, the value of one more bed under each cap, are $352.49 for carrots and $246.47 for mesclun (`Summary!K37:K38`); tomatoes and the slack limits are worth $0. Only the first extra bed is worth the full shadow price, and each bed after it is worth less (carrots: $352.49, then $298.09, then $241.77; `Unconstrained!I81:I83`).
 
-We did not reach the max of 64 total beds, and worker hours was not a limit — that was not a constraint.
+## Scenario A: all limits removed
 
-> **Model support**
-> - Beds: 60 used (`Optimization!B14`) of 64 (`Optimization!D14`).
-> - Labor hours: 5,277.22 used (`Optimization!B22`) of 6,480 available (`Optimization!D22`, also `Inputs!B14`), so 1,202.78 hours unused (`Optimization!E22`).
-> - Temp hours: 4,557.22 used (`Optimization!B21`) of a 5,760 ceiling (`Optimization!D21`), which is 3.16 of the 4 temp workers (`Summary!B18`).
+The `Unconstrained` tab removes the crop caps, the 64-bed total and the worker limit. It answers the question I set out to test: if carrots and mesclun expand, do I run out of labor? I do not.
 
-One thing I want to do a comparison on — and I'll ask for a model update on this — is to see: if I increase the amount of beds planted for carrots and mesclun, will I run out of worker hours? Was that actually a constraint? I want to see, with this constraint, what the max profitability is for this whole situation, and how many workers I need.
+- **Beds:** 10 tomato, 26 carrot, 37 mesclun, 73 in total (`Unconstrained!B7:E7`). Tomatoes do not change.
+- **Labor:** 6,453.11 of 6,480 hours, 26.89 under the limit (`Unconstrained!D32`), or 3.98 of the 4 temporary workers (`Unconstrained!B34`).
+- **Profit:** $45,010.80 (`Unconstrained!E20`), $2,249.13 or about 5.3% more than today (`Unconstrained!E22`).
 
-> **Model support** — this comparison is now built: the `Unconstrained` sheet (caps, bed total and worker limit all removed).
-> - Labor hours needed: 6,453.11 (`Unconstrained!B32`) against 6,480 available (`Unconstrained!C32`), so 26.89 hours **under** (`Unconstrained!D32`; status `Unconstrained!E32` = "under").
-> - Workers needed: 3.98 temp workers against the limit of 4 (`Unconstrained!B34`, `Unconstrained!C34`), so no extra worker is needed.
-> - Maximum profit with no limits: $45,010.80 (`Unconstrained!E20`), from 10 / 26 / 37 beds = 73 (`Unconstrained!B7:E7`).
-> - So worker hours were not what stopped the plan; the crop caps were.
+Labor was never the constraint; the crop caps were.
 
-One thing to consider: I've created a scenario, in the Unconstrained tab, of releasing the limitations/constraints. One of the impacts not being considered there is the cost of increasing the amount of land being used — if that included an additional fixed cost, that may change the situation. We don't have that cost for additional land, but what we saw is that, without the constraints, due to diminishing returns, it actually ends up being a fairly small increased profit — around $2,000. [$2,249.13 (`Unconstrained!E22`)]
+What this scenario leaves out is the cost of land. The 73 beds are 9 more than the farm has (`Unconstrained!D26`), and the model has no cost for extra land.
 
-> **Model support**
-> - Extra profit from releasing the limits: $2,249.13 (`Unconstrained!E22`) = $45,010.80 (`Unconstrained!E20`) − $42,761.66 (`Unconstrained!E21`, the model's `PROFIT`, also `CostStructure!B21`). That is about 5.3% more.
-> - Land needed: 73 beds is 9 more than the 64 you have (`Unconstrained!D26`) and 13 more than the 60 planted (`Unconstrained!D27`).
-> - The model has no cost for extra land: fixed costs stay $20,000 (`Inputs!B6`).
+## Scenario B: fertilizer bulk discount
 
-Therefore, unless the cost of adding land is very small, this probably would not be a useful thing to invest in — the additional land — or if hiring more workers added other overhead costs (only the fertilizer-discount scenario needs more than the current four workers, about 4.81), there just wouldn't really be an increase. This really points to the fact that while these constraints do put some limitations on profitability, we're seeing a fairly quick drop in profitability as we add more and more beds, due to diminishing returns. Adding more beds is really just not a way to maximize an increase in profits.
+The wage change is one input that bends the marginal-cost curve. The `FertScenario` tab tests another: a 30% bulk discount on fertilizer for every bed beyond 40 across the whole farm (`FertScenario!B7:B8`). Each discounted bed saves $264 (30% of $880).
 
-> **Model support**
-> - Workers: with the limits released and no discount, no extra workers are needed (3.98 needed, limit 4: `Unconstrained!B34`, `Unconstrained!C34`). Only the fertilizer-discount scenario needs more: 4.81 (`FertScenario!F18`), about 0.81 above the limit.
-> - Diminishing returns in dollars (price minus marginal cost, `Unconstrained`): the first carrot bed adds $1,120.15 (`I61`), the 20th $405.05 (`I80`), the 26th $60.77 (`I86`); the 27th would lose $3.81 (`I87`). Mesclun: $1,028.98 for the first bed (`N61`), $279.90 at bed 30 (`N90`), $33.07 at bed 37 (`N97`), −$4.73 at bed 38 (`N98`).
-> - The most extra land could cost: $2,249.13 ÷ 9 extra beds ≈ $250 per bed per season, before any other overhead. (Derived; not a workbook cell.)
-> - The extra labor is already counted: labor cost is $124,533.20 released (`Unconstrained!E18`) against $104,118.34 today (`CostStructure!B9`), $20,414.87 more, and the $2,249.13 is after that.
+Like the wage change, the discount produces a dip in marginal cost, but a much smaller one: $264, against $2,754.58 for the wage step. Under today's limits, tomato and carrot beds already total 30, so the dip shows up in mesclun. Mesclun marginal cost is $1,862.87 at its 10th bed (the farm's 40th) and falls to $1,622.22 at its 11th, where without the discount it would have risen to $1,886.22 (`FertScenario!J75`, `J76`, `D76`).
 
-The biggest thing would be looking at possibly another crop — one that lets you start off with a higher profit and start that diminishing-return curve fresh. It's by adding more crop types that you're going to see an increase in profitability, not by increasing the amount of beds.
+With today's limits, the mix stays 10 / 20 / 30 because the caps still bind, and profit rises $5,280 to $48,041.66 (`FertScenario!C16`, `D16`). With the limits also removed, the mix grows to 10 / 30 / 44 and profit to $55,336.48 (`FertScenario!F12:F16`), but that needs 20 more beds than the farm has and 4.81 temporary workers against the 4 allowed (`FertScenario!F18`, `F20`).
 
-**The tomato marginal cost dip at six beds**
+## What this means
 
-The marginal costs are going up, then suddenly dip at six, because of the change in labor costs — coming from the more expensive farmer at [$34.72 per hour (`Inputs!B9`)] to the temporary workers at [$17.36 per hour (`Inputs!B12`)] — resulting in a significant dip in the marginal costs at six. In some ways this resets the profitability concern: if there had not been that change in the workers' wages — let's say the farmer had more available hours, or we were required to hire another farmer at the same rate — the max beds would hit far earlier than 10.
+The constraints do limit profit, but not by much, because diminishing returns shrink each extra bed's contribution quickly (price minus marginal cost, `Unconstrained`):
 
-> **Model support** — marginal cost rises from $4,317.50 at bed 1 (`MCSchedules!H6`) to $7,660.86 at bed 5 (`MCSchedules!H10`), then dips to $4,906.28 at bed 6 (`MCSchedules!H11`), a $2,754.58 drop.
-> - The model flags it: `MCSchedules!M11` = "DIP" and `MCSchedules!B29` = "yes - non-monotonic".
-> - The switch happens at bed 5: cumulative labor there is 724.73 hours (`MCSchedules!B10`), just past the farmer's 720 hours (`Inputs!B7`). The farmer's $34.72 an hour is $25,000 of the $50,000 salary (`Inputs!B8`) over those 720 hours; a temp worker's $17.36 an hour is $25,000 (`Inputs!B10`) over 1,440 hours (`Inputs!B11`).
-> - "Far earlier than 10" holds: if every hour cost $34.72, the 6th tomato bed would cost about $8,932.55, above the $8,800 price, so tomatoes would stop at 5 beds (the 5th costs $7,742.97). (Calculated from the `Inputs` values outside the workbook; not a workbook cell.)
+- **Carrots:** $1,120.15 on the 1st bed, $405.05 on the 20th, $60.77 on the 26th; the 27th loses $3.81.
+- **Mesclun:** $1,028.98 on the 1st bed, $279.90 on the 30th, $33.07 on the 37th; the 38th loses $4.73.
 
-That's an example we could actually look at here — a comparison to similar situations, showing how the inputs really affect marginal cost. I've done an example, seen here at this tab, of what if fertilizer costs suddenly reduced by 30% for any beds past forty total beds across the entire farm — the idea being there was a discount for bulk ordering of fertilizer. In this case, just like the wage, this would be another input that, with some change in pricing, would cause this dip. And this dip would happen around — as we're matching the max, once we hit a total of 40 — we would see a dip across the other plant types, the other things being planted.
+Adding beds is therefore a weak way to grow profit, especially once extra land or extra workers carry costs of their own. The stronger option is another crop. A new crop starts at the top of its own diminishing-returns curve, where the gap between price and marginal cost is widest. More crop types, not more beds, is where the larger increase in profit would come from.
 
-> **Check** — the fertilizer discount is a $264 step, much smaller than the wage step.
-> - Inputs: 40 beds (`FertScenario!B7`) and 30% (`FertScenario!B8`). A discounted bed saves 30% × $880 = $264 (`Inputs!B19`, `Inputs!D19`).
-> - The step at 40 total beds: the discount is $0 at 40 beds (`FertEnum!H20684`), $264 at 41 (`FertEnum!H20685`), $528 at 42 (`FertEnum!H20686`).
-> - You can see the dip for mesclun under today's limits (`FertScenario`, tomatoes 10 + carrots 20 = 30 beds already planted): at bed 10 (40 beds on the farm) the marginal cost is $1,862.87 (`J75`); at bed 11 (41 beds) it falls to $1,622.22 (`J76`), where without the discount it would have risen to $1,886.22 (`D76`).
-> - Every crop's marginal cost drops by the same $264, including carrots: last-bed tomatoes $8,248.59 → $7,984.59 (`FertScenario!C27` → `D27`), carrots $1,688.95 → $1,424.95 (`C28` → `D28`), mesclun $2,420.10 → $2,156.10 (`C29` → `D29`). For comparison, the wage step is $2,754.58 (`MCSchedules!H10` → `H11`).
+## Why grow a crop that loses money on its own?
 
-Looking at the new fertilizer scenario tab: with the discount but with the limitations still in place, it makes no difference in the amount of beds — that limitation is still a restriction — however, it does increase the profitability with a fertilizer discount going in.
+The $20,000 in fixed costs (`Inputs!B6`) is paid no matter what I plant. On its own, before fixed costs, carrots' best profit is $3,511.08 and mesclun's is $8,077.81 (`MCSchedules!K56`, `K99`). Neither could cover $20,000 alone, while tomatoes could ($26,172.77, `MCSchedules!K15`).
 
-> **Model support** — today's limits (`FertScenario`, columns B to D): beds stay 10 / 20 / 30 (`B12:C14`); profit rises from $42,761.66 (`B16`) to $48,041.66 (`C16`), up $5,280 (`D16`), which equals the discount applied (`C21`).
+That is the wrong test, though. The question for each bed is not whether its crop covers the fixed costs, but whether the bed's price exceeds its marginal cost. Every bed that clears that bar adds to the margin that pays down the fixed costs, even if the crop as a whole would lose money on its own. The gap shrinks bed by bed, but summed over many beds it adds up. Each crop's variable margin (`CostStructure!B16:B18`) is $33,143.42 for tomatoes, $13,682.27 for carrots and $15,935.98 for mesclun: $62,761.66 together, about 3.1 times the fixed costs (Figure 3). So the best practice is to plant every bed whose marginal cost is below the price.
 
-However, if no limitations — if these limitations on labor and bed limits were removed — with the discount, you would see no change in tomatoes. As stated before, tomatoes just do not go past ten; the marginal cost is just above the price no matter what past ten, so there's no change there. What you do see is an increase in the amount of carrots from 20 to 26 with no discount, and an increase in mesclun beds from 30 to 37 with no discount, for a total of 73 beds. You do have increased labor costs, but you're still under the total labor limits.
+**Figure 3** — Each crop's variable margin, the $20,000 in fixed costs, and the $42,761.66 season profit that remains at 10 / 20 / 30 beds. Data: `CostStructure!B16:B21`.
 
-> **Model support** — limits released, no discount (`FertScenario` column E, the same figures as `Unconstrained`):
-> - Beds 10 / 26 / 37 = 73 (`E12:E15`; also `Unconstrained!B7:E7`).
-> - Labor hours 6,453.11 (`E17`), which is 26.89 under the labor limit (`E19`).
-> - Tomatoes stay at 10 even with the discount: the 11th bed would still cost $9,126.72 with the discount (`FertScenario!J27`), above the $8,800 price (`FertScenario!B27`).
+![Variable margin by crop, fixed costs and season profit](figures/perfect-competition-margin-vs-fixed-costs.png)
 
-Where this really adds more is when the constraints on beds or labor are not included, and the discount is being applied. Tomatoes are still the same 10 beds. For carrots, that jumps up to 30 beds, and for mesclun, 44 beds, for a total amount of 84. There you end up using an additional 1,162.34 labor hours past the current labor cap, but you do see increased profitability with that — and this is the max profitability with this setup.
+## My Stage One hypothesis
 
-> **Model support** — limits released with the discount (`FertScenario` column F):
-> - Beds 10 / 30 / 44 = 84 (`F12:F15`); 84 is 20 more than the 64 you have (`F20`).
-> - Labor hours 7,642.34 (`F17`), which is 1,162.34 over the 6,480-hour limit (`F19`; limit at `Inputs!B14`). Temp workers needed: 4.81 (`F18`) against 4 (`Inputs!B13`).
-> - Profit $55,336.48 (`F16`): $10,325.68 more than released without the discount (`G16`) and $12,574.81 more than today's $42,761.66 (`B16`). It is the best of all the bed mixes tested (`FertEnum!S3`), and the best mix is inside the tested range (`FertEnum!Q15` = PASS).
->
-> **Figure 2** — Tomato marginal cost (top) and cumulative labor hours (bottom) by bed, beds 1 to 12. The dotted line is bed 5, where cumulative hours first pass the farmer's 720 hours (`MCSchedules!B10` = 724.73 hours; `Inputs!B7` = 720); marginal cost then falls from $7,660.86 at bed 5 (`MCSchedules!H10`) to $4,906.28 at bed 6 (`MCSchedules!H11`). File: `analysis/figures/perfect-competition-tomato-mc-and-hours.png`
->
-> ![Tomato marginal cost and cumulative labor hours by bed](figures/perfect-competition-tomato-mc-and-hours.png)
+My Stage One hypothesis was 10 tomato, 20 carrot and 30 mesclun beds (`docs/briefs/perfect-competition-brief.md`). The model's result matches it exactly (`Optimization!B4:B6`), which surprised me.
 
-**Why grow crops that lose money on their own?**
+My reasoning was that tomatoes' 10% diminishing-returns rate meant they would not reach their 20-bed cap, so I guessed half: 10 beds. Carrots and mesclun earn less per bed, but their lower rates (2.5% and 1.25%, `Inputs!C18:D18`) meant they would keep paying off at higher volume, so I planted both to their caps. That reasoning held.
 
-The key thing here is the fixed costs, as seen in cell [`Inputs!B6`], of $20,000. That has to be covered one way or another. The fixed costs are spread thinner per a bed. That makes a big difference as long as the variable costs are less than the price and that difference repeated for each bed pays off a portion of the fixed costs. But that fixed cost is paid anyway. So a crop that might lose money on its own, when contributing to paying off that fixed cost, can still be of value to the overall enterprise.
-
-> **Model support** — fixed costs are $20,000 (`Inputs!B6`, also `CostStructure!B19`).
-> - Spread per bed (derived as $20,000 ÷ beds; not workbook cells): about $333.33 a bed at today's 60 beds (`Optimization!B7`), $273.97 at the 73 beds with the limits released (`Unconstrained!E7`), $238.10 at the 84 beds with the fertilizer discount (`FertScenario!F15`).
-> - Price above marginal cost at today's last planted bed: tomatoes $8,800 against $8,248.59, carrots $2,094 against $1,688.95, mesclun $2,700 against $2,420.10 (`Summary!D22:E24`).
-> - Each crop's variable margin (`CostStructure!B16:B18`): tomatoes $33,143.42, carrots $13,682.27, mesclun $15,935.98. Together $62,761.66, about 3.1 times the $20,000 fixed cost.
-> - Each crop's best profit on its own, before fixed costs: tomatoes $26,172.77 at 10 beds (`MCSchedules!K15`), carrots $3,511.08 at 20 (`MCSchedules!K56`), mesclun $8,077.81 at 30 (`MCSchedules!K99`). Against one full $20,000, tomatoes would still cover it (+$6,172.77) but carrots (−$16,488.92) and mesclun (−$11,922.19) would not. That is the "loses money on its own" case.
-
-Here's where one of the greatest values in addressing this fixed cost is: to produce as much of the crop as possible, as long as the marginal cost is lower than the price. Even if overall you are losing money, that slight difference between the marginal cost and the price is helping chip away at the total fixed amount. For a single bed, a high difference is good — but even as that difference between the marginal cost and the price gets smaller and smaller due to diminishing returns, the sum of those differences, at a high number of beds, can take a big chunk out of that fixed cost. That is where it has value and is worth pursuing.
-
-> **Model support** — the shrinking gap between price and marginal cost, bed by bed (`Unconstrained`, "PRICE - MC" columns): carrots $1,120.15 at bed 1 (`I61`), $405.05 at bed 20 (`I80`), $60.77 at bed 26 (`I86`); mesclun $1,028.98 (`N61`), $279.90 at bed 30 (`N90`), $33.07 at bed 37 (`N97`); tomatoes $6,201.25 at bed 1 (`D61`), $551.41 at bed 10 (`D70`), then −$590.72 at bed 11 (`D71`). Together the three crops' variable margins ($62,761.66, `CostStructure!B16:B18`) are about 3.1 times the $20,000 fixed cost (`Inputs!B6`).
->
-> **Figure 3** — Each crop's variable margin ($33,143.42 tomatoes, $13,682.27 carrots, $15,935.98 mesclun; `CostStructure!B16:B18`), the $20,000 fixed costs (`CostStructure!B19`), and the season profit that remains at 10 / 20 / 30 beds, $42,761.66 (`CostStructure!B21`). File: `analysis/figures/perfect-competition-margin-vs-fixed-costs.png`
->
-> ![Variable margin by crop, fixed costs and season profit](figures/perfect-competition-margin-vs-fixed-costs.png)
-
-**Regarding my Stage One hypothesis**
-
-I'm somewhat surprised and dumbfounded that my hypothesis was exactly right on to the final result: ten tomatoes, twenty carrots, thirty mesclun.
-
-> **Model support**
-> - The Stage 1 brief (`docs/briefs/perfect-competition-brief.md`, `hypothesis:` line): "10 tomato / 30 mesclun / 20 carrot".
-> - The model: 10 tomato (`Optimization!B4`), 20 carrot (`Optimization!B5`), 30 mesclun (`Optimization!B6`); also `Summary!B3:B5`, and the enumeration maximum agrees (`Enumeration!S2:S4`).
-> - Diminishing-returns rates: carrots 2.5% (`Inputs!C18`) and mesclun 1.25% (`Inputs!D18`), against 10% for tomatoes (`Inputs!B18`).
-
-I did make that decision recognizing that tomatoes, due to their high diminishing return, would not likely be at full capacity, and guessed at half — a nice even number of 10. I did not realize I would be exactly on. I then looked at maxing out the other two, since those seemed to be the ones that, while they did not have the highest price, their shorter diminishing-return rate would, at a higher volume, pay off. It appears that was correct.
-
-> **Check** — "shorter diminishing-return rate" reads as "smaller" or "lower" rate (2.5% and 1.25% against 10%, `Inputs!C18`, `Inputs!D18`, `Inputs!B18`).
->
-> **Check for the Stage 3 checklist** — the brief's reasoning was that tomato marginal cost compounds past the $8,800 price by bed 11, and the model agrees (`MCSchedules!H16`). What the brief did not anticipate is the dip at bed 6 caused by the switch from farmer to temp labor (`MCSchedules!H10` → `H11`), and that labor was never the binding limit (`Optimization!E22`, `Unconstrained!D32`). Say so if the honest-reflection paragraph asks what the brief missed.
-
-I had also added an additional element for how I would know I was wrong — giving myself a three-bed margin in either direction — to determine if, while I might have had the idea correct with my hypothesis, calculation-wise I didn't have an exact calculation that would have been right on. So that margin also did not end up mattering here.
-
-> **Model support** — the brief's margin: "tomato, mesclun, and carrot counts each shifting by 3 or fewer" (`docs/briefs/perfect-competition-brief.md`, "How I would know I was wrong"). Your eleven / nineteen / twenty-eight example is within it: 1, 1 and 2 beds from 10 / 20 / 30. The model's gap is 0 for all three (`Optimization!B4:B6`).
-
-I still stand by it — I think that was a good approach, since I could have easily said eleven tomatoes, nineteen carrots, and twenty-eight mesclun, and I still think my guess would have been following the correct line of logic. I just happened to hit it perfectly with these even numbers, so I think that was still a good approach for doing so.
+To judge whether I was wrong, I allowed a margin of 3 beds in either direction for each crop. That margin separated sound reasoning from imperfect arithmetic, and it did not come into play: the gap was 0 beds for all three crops. I still think the approach was right. A guess of 11 tomato, 19 carrot and 28 mesclun beds would have followed the same logic; landing exactly on the answer came partly from choosing round numbers.
