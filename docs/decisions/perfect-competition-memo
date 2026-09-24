@@ -1,0 +1,13 @@
+Section 1 — The plan, one-sentence justification
+- The mix: 10 tomato / 20 carrot / 30 mesclun, profit $42,761.66 (Optimization!B4:B7, CostStructure!B21)
+- Justification hook: tomato stops on price (MC crosses $8,800 at bed 11), carrots/mesclun stop on their bed caps, not on price — different reason for each crop's stopping point.
+
+Section 2 — Judgment call: which constraint to relax first
+- Source facts to build the sentence from: shadow prices carrots $352.49/bed vs. mesclun $246.47/bed (Summary!K37/K38); full release of all caps only gains $2,249.13 across 9 extra beds — about $250/bed before any land overhead (derived, not a cell).
+- The call itself: carrots first (highest per-bed value) — but conditional on land costing less than roughly $250/bed, since that's the whole margin.
+- This is where line 83's "unless the cost of adding land is very small, this probably would not be a useful thing to invest in" belongs — pull it here, cut it from the analysis.
+
+Section 3 — One variable sensitivity statement
+- Source facts: 30% fertilizer discount past 40 total beds raises profit $42,761.66 → $48,041.66 under today's caps with no change in bed counts (FertScenario!B16/C16); with caps also released, $55,336.48 at 84 beds (F16).
+- The statement: this is worth pursuing independent of the land/carrot-cap question — it doesn't require settling section 2 first.
+- Lines 110, 114, 121 (the "what to plant under each discount/cap combination" walk-through) are the source material — compress to this one line in the memo, don't keep the full walk-through anywhere.
