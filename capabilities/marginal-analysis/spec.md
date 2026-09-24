@@ -728,34 +728,33 @@ Solver — is flagged per check.
   marginal costs: `MARG_COST(TOM, 10) = 8,248.59`, `MARG_COST(CAR, 20) =
   1,688.95`, `MARG_COST(MES, 30) = 2,420.10`, and `MARG_COST(TOM, 6) =
   4,906.28` (the tomato dip). Largest disagreement `1.5e-11`. — PASS for
-  self-consistency and spec-conformance; the check against the Farm Profit Lab
-  itself is recorded below.
-- **Farm Profit Lab reconciliation (owner's manual audit).** Micah entered a
-  mix into the Farm Profit Lab web calculator (linked from the Stage 2 case
-  page) and compared its output to this model. Test point: `q(TOM)=7,
-  q(CAR)=9, q(MES)=4` — a spot check away from the optimum, not `(10,20,30)`.
-
-  | Figure | Farm Profit Lab | This model, recomputed from the spec's formulas |
-  |---|---|---|
-  | PROFIT | 14,653.66 | 14,653.66 |
-  | TOTAL_LABOR_COST | 42,952 | 42,952.34 |
-
-  `(7,9,4)` isn't a combination the built workbook stores directly, so the
-  right-hand column was computed independently here from `LABOR_HRS`, the
-  farmer-then-temp blended rate, and `FIXED_COSTS`, not read off a cell.
-  Matches to the cent on profit; labor cost matches to the precision Micah
-  reported. PASS. Closes the "Farm Profit Lab itself" gap left open by the
-  independent-implementation cross-check above.
-- **Two Solver starting points.** Excel Solver (GRG Nonlinear) was not run.
-  Proxy: an integer hill-climb (violation-descent, then profit-ascent over
-  feasible ±1 neighbours) from the two spec-mandated starts. `(0, 0, 0)` →
-  `(10, 20, 30)` at `42,761.66`; `(20, 0, 0)` → `(10, 20, 30)` at `42,761.66`
-  (note `(20, 0, 0)` is itself infeasible — 20 tomato beds alone blow the
-  5,760 temporary-hour ceiling — so a real Solver would repair it first). Both
+  self-consistency and spec-conformance; a check against the Farm Profit Lab
+  itself remains open.
+- **Two Solver starting points (proxy, before the real run).** Excel Solver
+  (GRG Nonlinear) had not been run yet at this point. Proxy: an integer
+  hill-climb (violation-descent, then profit-ascent over feasible ±1
+  neighbours) from the two spec-mandated starts. `(0, 0, 0)` → `(10, 20, 30)`
+  at `42,761.66`; `(20, 0, 0)` → `(10, 20, 30)` at `42,761.66` (note
+  `(20, 0, 0)` is itself infeasible — 20 tomato beds alone blow the 5,760
+  temporary-hour ceiling — so a real Solver would repair it first). Both
   starts agree with each other and with the Enumeration maximum over all 9,726
   feasible integer combinations, which is what populates the decision cells and
-  is authoritative per this spec. — PASS (proxy); the Solver run itself is
-  outstanding.
+  is authoritative per this spec. PASS (proxy); the real Solver run is recorded
+  next.
+- **Two Solver starting points (owner's manual audit, the real run).** Micah
+  ran the full setup from the Solver setup section above — objective
+  `Optimization!$B$10`, changing cells `$B$4:$B$6`, all nine constraints,
+  GRG Nonlinear, Integer Optimality 0% — from both `(0, 0, 0)` and
+  `(20, 0, 0)`. No repair prompt on opening the file. Both runs converged to
+  bed counts that check out against `(10, 20, 30)`. `Optimization!B30`
+  (`Q_TOM=ENUM_OPT_QT` etc., an exact equality test against the Enumeration
+  sheet's hardcoded 10/20/30) read "MISMATCH" on both runs despite the
+  matching bed counts. Most likely explanation, not confirmed: GRG Nonlinear
+  with integer constraints can leave a sub-integer residual (e.g.
+  `9.9999999997` instead of `10`) that displays as a whole number but fails an
+  exact `=` comparison; the session was closed before a helper cell
+  (`=B4-10`, `=B5-20`, `=B6-30`) could confirm this. PASS on the allocation
+  itself; the `B30` exact-match anomaly is noted, not resolved.
 - **Stage 2 published check figures.** Season profit: model `42,761.66` vs
   published `42,762` — reconciles within `$0.34` after the `LABOR_HRS_WK(CAR) =
   5/6` change (see below). Optimal mix: model `q(TOM)=10`, `q(CAR)=20`,
