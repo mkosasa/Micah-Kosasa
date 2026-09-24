@@ -728,8 +728,24 @@ Solver — is flagged per check.
   marginal costs: `MARG_COST(TOM, 10) = 8,248.59`, `MARG_COST(CAR, 20) =
   1,688.95`, `MARG_COST(MES, 30) = 2,420.10`, and `MARG_COST(TOM, 6) =
   4,906.28` (the tomato dip). Largest disagreement `1.5e-11`. — PASS for
-  self-consistency and spec-conformance; a check against the Farm Profit Lab
-  itself remains open.
+  self-consistency and spec-conformance; the check against the Farm Profit Lab
+  itself is recorded below.
+- **Farm Profit Lab reconciliation (owner's manual audit).** Micah entered a
+  mix into the Farm Profit Lab web calculator (linked from the Stage 2 case
+  page) and compared its output to this model. Test point: `q(TOM)=7,
+  q(CAR)=9, q(MES)=4` — a spot check away from the optimum, not `(10,20,30)`.
+
+  | Figure | Farm Profit Lab | This model, recomputed from the spec's formulas |
+  |---|---|---|
+  | PROFIT | 14,653.66 | 14,653.66 |
+  | TOTAL_LABOR_COST | 42,952 | 42,952.34 |
+
+  `(7,9,4)` isn't a combination the built workbook stores directly, so the
+  right-hand column was computed independently here from `LABOR_HRS`, the
+  farmer-then-temp blended rate, and `FIXED_COSTS`, not read off a cell.
+  Matches to the cent on profit; labor cost matches to the precision Micah
+  reported. PASS. Closes the "Farm Profit Lab itself" gap left open by the
+  independent-implementation cross-check above.
 - **Two Solver starting points.** Excel Solver (GRG Nonlinear) was not run.
   Proxy: an integer hill-climb (violation-descent, then profit-ascent over
   feasible ±1 neighbours) from the two spec-mandated starts. `(0, 0, 0)` →
