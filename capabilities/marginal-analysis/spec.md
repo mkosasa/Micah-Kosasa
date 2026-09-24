@@ -746,9 +746,35 @@ Solver — is flagged per check.
   `q(MES)=30` — matches the brief hypothesis and the Enumeration maximum.
   Standalone `PRICE = MC` crossings, as the model computes them:
   `XING_FIRST` (first bed with `MC >= PRICE`) `= 11 / 11 / 7` for TOM / CAR /
-  MES; `XING` (profit-maximizing bed count) `= 10 / 20 / 30`. OUTSTANDING: the
-  Stage 2 page's own optimal-mix and crossing-point figures were not retrieved
-  (spec-alone build), so that head-to-head is for the owner.
+  MES; `XING` (profit-maximizing bed count) `= 10 / 20 / 30`.
+
+  **Head-to-head against the Stage 2 case page's own published figures**
+  (`case-perfect-competition-stage2.html`, retrieved as raw page text, not a
+  summary): optimal mix "Tomatoes 10 · Carrots 20 · Mesclun 30 (60 beds)" —
+  exact match. Season profit "$42,762" — matches within $0.34 (above).
+  Standalone P ≈ MC points: "Tomatoes ~10 · Carrots ~10 · Mesclun ~6 beds" —
+  each one less than this model's `XING_FIRST` (11 / 11 / 7), consistent with
+  the page describing the last bed still below price rather than the first
+  bed at or above it; same crossing, opposite side.
+
+  Carrot's and mesclun's single published number hides something the model's
+  full schedule shows and the page's summary doesn't: both standalone curves
+  cross price **twice**, not once. Checked directly against `MCSchedules`:
+  carrot's MC rises above its $2,094 price from bed 11 ($2,140.11) through
+  bed 16 ($2,552.10), then the farmer-to-temp wage switch drops it back under
+  price at bed 17 ($1,670.90), where it stays through the bed-20 cap
+  ($1,688.95) and beyond. Mesclun does the same: above its $2,700 price from
+  bed 7 ($2,710.71) through bed 13 ($2,988.40), then back under at bed 14
+  ($2,522.58) through bed 19+ ($2,089.05). `XING_FIRST` reports only the
+  first of these two crossings — bed 11 for carrots, bed 7 for mesclun — which
+  is not the point where either crop actually stops being planted (the
+  bed-20/bed-30 caps still sit on the second, profitable side of the dip).
+  The published check's "~10 / ~6" is correct as far as it goes, but a reader
+  who took it as "carrots and mesclun stop paying off around there" would be
+  wrong; that misses the dip entirely, and the dip is why the caps still bind
+  on the profitable side. — PASS on all three published figures; this
+  two-crossing behavior generalizes the tomato dip Stage 3 already covers to
+  carrots and mesclun as well, previously unnoted in this spec.
 - **Season profit vs. published check figure (root cause).** The first build,
   reading `LABOR_HRS_WK(CAR)` as the printed `0.833`, computed `42,768.49` —
   `$6.49` above the published `42,762`. Traced: recomputing with
