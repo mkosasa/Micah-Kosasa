@@ -38,3 +38,7 @@ $RECYCLE.BIN/
 credentials.json
 secrets.yml
 secrets.yaml
+
+# Throwaway work for the research paper
+# Kept local and never committed; the assignment page says to ignore it early.
+scratch/
