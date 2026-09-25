@@ -58,7 +58,12 @@ fill in what you got wrong, and never assess how I verified your output — thos
 are mine.
 - Graded work means the deliverables of a BUS 620 engagement — currently
   perfect-competition: its brief, capability spec and model, analysis, figures,
-  and decision memo. If a session is not clearly that, do not log it (other
+  and decision memo; and the individual research paper: its brief
+  (`docs/briefs/research-brief.md`), capability spec
+  (`capabilities/economic-research/`), dated drafts (`drafts/`), figures
+  (`analysis/figures/`), and the paper (`analysis/research-paper.pdf`). For the
+  research paper, log every AI session on it, including setup and questions
+  that led to no file change. If a session is not clearly that, do not log it (other
   courses, work, DPH, resume or bio, skills and routines, general questions).
   If you are unsure, ask me; if I am not available, do not log it and say so in
   your report.
