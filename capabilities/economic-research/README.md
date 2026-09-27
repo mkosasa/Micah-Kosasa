@@ -21,4 +21,4 @@ kept under `analysis/` to match this repo's layout). Dated drafts live in
 
 | Engagement | Brief | Status |
 |---|---|---|
-| research paper | `docs/briefs/research-brief.md` | Not started; brief not yet written |
+| research-paper | `docs/briefs/research-brief.md` | Brief written (status: draft); spec not started |
