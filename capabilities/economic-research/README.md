@@ -12,6 +12,12 @@ against objections.
 - `spec.md`: data sources, models, figures, and success criteria for the
   paper. Committed 2026-09-28; `status: draft` until the model is built.
   Its draft-marked values are to be verified in the model audit.
+- `model.xlsx`: the model built from `spec.md` (2026-09-28). It recalculates
+  fully on open and carries the engine's computed values. Every sheet,
+  including all 16 scenario runs, was evaluated with a formula engine (no
+  error cells; 45 of 45 worked-example anchors pass) and matches an
+  independent re-implementation of the spec. The spec's audit is still to
+  come.
 - `README.md`: this file.
 
 Figures live in `analysis/figures/` (the assignment page names `figures/`;
@@ -22,4 +28,4 @@ kept under `analysis/` to match this repo's layout). Dated drafts live in
 
 | Engagement | Brief | Status |
 |---|---|---|
-| research-paper | `docs/briefs/research-brief.md` | Brief committed (frozen) 2026-09-28; spec committed 2026-09-28 (`spec.md`, status draft); model not yet built |
+| research-paper | `docs/briefs/research-brief.md` | Brief committed (frozen) 2026-09-28; spec committed 2026-09-28 (`spec.md`, status draft); model built and evaluated 2026-09-28 (`model.xlsx`), audit pending |
