@@ -98,4 +98,4 @@ No Protected Health Information as defined under HIPAA. Anything coming from my 
 
 ## Mistakes to avoid (append to this list)
 Record errors here as they happen, so the same one does not repeat.
-- (empty — add the first one when it happens)
+- 2026-09-27: An agent stacked a new branch (PR #41) on an open PR's branch (PR #40) and kept pushing prompt-log rows to #40 after merging had started. #40 was squash-merged, which dropped the later rows from main, and #41 then conflicted in `prompt-log.md`. Fixed by merging main into #41's branch and keeping every row. Rule: branch each change from `origin/main`; never stack on an open PR; never push more commits to a PR that may already be merging.
