@@ -2,8 +2,8 @@
 type: brief
 engagement: research-paper
 capability: economic-research
-date: 2026-09-27
-status: draft
+date: 2026-09-28
+status: committed
 hypothesis: "About 150 transitional beds, funded by a hospital consortium under a state-enforced agreement and paired with a statewide rate rule, maximize system-wide net savings: each bed frees ~252 hospital days a year only while it can take patients stuck for lack of a bed that accepts Medicaid (up to 87 of the 191 waitlisted on Dec 31, 2023, ≈37,900 of 83,097 waitlist days), and past that the marginal bed mostly meets behavioral, special-care and guardianship cases it can't take, so its freed days fall off while its cost stays flat or rises; the first beds break even at an avoidable hospital cost of about $900 a day"
 ---
 
@@ -57,7 +57,7 @@ If the model puts the break-even avoidable cost above $1,470, the top of my rang
 
 If patients can't move on after their stay, the bed stops working as a transitional bed. At about $227,000 a year per bed, if average stays run past about 50 days, each bed frees too few hospital days and the break-even rises above $1,470. The partnership then fails unless care-home or home-care capacity is added with it.
 
-If one hospital's own avoided waitlist days, valued at its avoidable cost, cover the full cost of the beds those days would fill, that hospital would build without partners. The prisoner's dilemma isn't what holds building back, and the consortium and the state's commitment add little beyond the rate rule. The same holds if hospitals still won't sign a binding, benefit-based agreement once the state stands ready to enforce it: then something other than free riding, such as staffing, is what stops the beds.
+If one hospital's own avoided waitlist days, valued at its avoidable cost, cover the full cost of the beds those days would fill, that hospital would build without partners. The prisoner's dilemma isn't what holds building back, and the consortium and the state's commitment add little beyond the rate rule. The model also computes each hospital's benefit-based share of the capital cost against its own saving; if any hospital's share exceeds its saving, that hospital would not join even with the state enforcing the contract, and the consortium design fails.
 
 If the new beds' operating cost excluding capital came out above the Medicaid rate excluding its capital component, even with the rate rule in place, that would mean I misunderstood the operating side, independent of the bed-count argument, and the partnership would be a continuing subsidy, not a one-time investment.
 
