@@ -122,6 +122,7 @@ One workbook, `capabilities/economic-research/model.xlsx`, replacing the old one
 
 - `DAYS_PER_PT(y) = WL_DAYS(y) / WL_PATIENTS(y)`
 - `BENCH_TOTAL(y) = WL_PATIENTS(y) * BENCH_DAYS`
+- `GAP_PER_PT(y) = DAYS_PER_PT(y) - BENCH_DAYS`, the signed gap (negative in years under the benchmark)
 - `EXCESS_DAYS(y) = MAX(0, WL_DAYS(y) - BENCH_TOTAL(y))` (floored at 0 in years at or under the benchmark)
 - `WITHIN_DAYS(y) = WL_DAYS(y) - EXCESS_DAYS(y)` (figure d)
 - `EXCESS_SHARE(y) = EXCESS_DAYS(y) / WL_DAYS(y)`
@@ -165,6 +166,7 @@ One workbook, `capabilities/economic-research/model.xlsx`, replacing the old one
 
 - **Definitions set after results.** I locked the three tests on Sep 28, before pulling the 2017 to 2022 data. I set the definitions below on Sep 28, after I had seen the results. The paper says so.
 - **Which days count.** The gap and its cost cover the whole acute waitlist, all levels of care, because the yearly figures aren't split by level. The Dec 31 nursing-facility shares (82% in 2023, 69% in 2024) are reported beside the result, not used to scale it.
+- **Excess days are a lower bound.** Excess days are measured against the average benchmark (total days minus patients x 14, floored at 0), not patient by patient. Because some patients wait beyond 14 days even in a year whose average is under 14, they are a lower bound on the days patients spent beyond 14, and the paper does not describe them as days patients waited beyond two weeks. `GAP_PER_PT` shows each year's signed margin.
 - **Days in the year.** Calendar days: 366 in 2020 and 2024.
 - **Reason shares.** The denominator is the sum of the seven recorded reasons (`REASON_SUM`), not the Dec 31 total by level of care. For 2017 that is 120, not 157.
 - **Year's waitlisted rate.** The simple average of the January and July rates.
@@ -195,6 +197,7 @@ Hand checks (from the draft inputs):
 | `EXCESS_DAYS(2023)`, `EXCESS_DAYS(2024)` | 32,557; 17,154 |
 | `EXCESS_BEDS(2023)`, `EXCESS_BEDS(2024)` | 89.2 (365 days), 46.9 (366 days) |
 | `EXCESS_DAYS` in 2017, 2018, 2020, 2021 | 0 (days per patient under 14) |
+| `GAP_PER_PT(2017)`, `GAP_PER_PT(2024)` | -4.06, +5.49 |
 | `WL_RATE_AVG(2023)`, `WL_RATE_AVG(2024)` | 293.245, 460.28 |
 | `NET_COST_LO(2024)`, `NET_COST_HI(2024)` | 89.72, 1,009.72 |
 | `EXCESS_COST_LO(2024)`, `EXCESS_COST_HI(2024)` | about 1,539,057; about 17,320,737 |
@@ -209,7 +212,7 @@ Hand checks (from the draft inputs):
 
 ## Outputs
 
-- By year, 2017 to 2024: `DAYS_PER_PT`, `WL_DAYS`, `EXCESS_DAYS`, `EXCESS_SHARE`, `EXCESS_BEDS`, `MEETS_BENCH`, the seven `SHARE_` values, `LTC_UNSTAFFED`, COVID flag.
+- By year, 2017 to 2024: `DAYS_PER_PT`, `GAP_PER_PT`, `WL_DAYS`, `EXCESS_DAYS`, `EXCESS_SHARE`, `EXCESS_BEDS`, `MEETS_BENCH`, the seven `SHARE_` values, `LTC_UNSTAFFED`, COVID flag.
 - 2023, 2024 and now: `WL_RATE_AVG`, `NET_COST_LO/HI`, `EXCESS_COST_LO/HI` (and the `_NOW` versions); `NF_SHARE_DEC31`; `WL_DAYS_CHANGE_2024`.
 - County row: `CTY_DAYS_PER_PT(c,y)` and `CTY_DAY_SHARE(c,y)`, 2023 and 2024.
 - Tests: `T1_DROP_2021`, `T1_DROP_2024`, `T1_VERDICT`; `T2_SLOPE`, `T2_VERDICT`; `LARGEST_REASON(y)`, `T3_YEARS`, `T3_VERDICT`.
