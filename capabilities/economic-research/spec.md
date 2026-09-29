@@ -3,7 +3,7 @@ type: spec
 capability: economic-research
 engagement: research-paper
 date: 2026-09-28
-status: draft            # draft | built | audited
+status: built            # draft | built | audited
 built_with: "Claude Code, from this file"
 ---
 
@@ -247,4 +247,36 @@ A finished paper:
 
 ## Audit findings
 
-Added after the build.
+Build of 2026-09-29, by Claude Code from this spec (main at `3641f5d`), on branch `research-model-build`. Every value is still a draft until I verify it against its source (the SHPDA counts, the OCR rate medians, the 2017 reason totals, the Medicaid-heavy rule, $3,664, the 543 days, the CAH share).
+
+### What was checked
+
+| Check | Method | Result |
+|---|---|---|
+| Hand checks and relational rules | 32 rows on the `Checks` sheet, evaluated by the `formulas` engine, then in Excel | 32 of 32 PASS in the engine; I opened the workbook in Excel: no errors, every row PASS |
+| Calculation logic | Independent Python re-implementation from the scratch CSVs, compared output by output with the engine | 195 outputs, 0 mismatches |
+| Inputs | Every `Inputs` cell compared with this spec's own tables and values (parsed from this file, not the CSVs); rate and cost series by count, endpoints and the blank 2019-07 median | 154 comparisons, 0 differences |
+| Figure c rate slots | 21 January/July slots, Jan 2016 to Jan 2026, against the rate series | 0 mismatches; breaks at Jan 2018, Jul 2019, Jan 2020, Jan 2021, Jul 2022 |
+| Formulas only outside `Inputs` | Script | 0 typed numbers outside `Inputs` |
+| Yellow fill | Script | Every input value yellow; no formula or cell outside `Inputs` yellow |
+| Error cells | Engine | 0 |
+| Names | Explicit list from this spec | 76 names, all absolute: the 71 in this spec (with `SHARE_<reason>` expanded to seven names) plus 5 I approved (`YEAR`, `RATE_DATE`, `COST_FY`, `COUNTY`, `COVID_FLAG`); none missing, none extra |
+| Clipped text | Script estimate of display width against column width and row height | 0 |
+
+### What was found
+
+- Results: days per patient 23.02 (2023) and 19.49 (2024); excess days 32,557 and 17,154; beds 89.2 and 46.9; signed gap -4.06 (2017) and +5.49 (2024); average waitlisted rate 293.245 and 460.28; 2024 net cost 89.72 to 1,009.72 per day; test 1 drops -1.92 and -11.12 points; test 2 slope +1.88; test 3, 5 years (2017 to 2021). All match the hand checks above.
+- Verdicts: test 1 "Falsified"; test 2 "Not met"; test 3 "Met", with 2017 flagged.
+- No calculation error found. The first build displayed some values finer than the Precision convention (signed gap and test 2 slope to 2 decimals, the average waitlisted rate to 3 decimals, test 1 shares and drops to 0.01 point); corrected. The first figures used "Health Care Utilization Reports" in the source lines and had figure c's note only in the caption; corrected to this spec's wording and a note on the chart.
+
+### What was done, and build conventions not stated above
+
+- Hand-check expected values are constants inside the `Checks` formulas (no typed values outside `Inputs`); tolerance is half a unit of the precision shown in the hand-check table. My decision.
+- Series formulas read names by position (`INDEX(name,k)` or `INDEX(name,MATCH(year,YEAR,0))`), never a bare range name in a cell, so Excel 365 cannot spill or add `@`.
+- Figure c's missing slots are empty strings in `FigureData`, not `#N/A`, so the line breaks without error cells.
+- The 2017 to 2022 cells of `DEC31_NF`, `WL_RATE_JAN` and `WL_RATE_JUL` are blank and not yellow (no input exists). My decision.
+- Index columns on `Inputs` (`YEAR`, `RATE_DATE`, `COST_FY`, `COUNTY`, memo IDs) are gray row headers, not yellow, and the blank 2019-07 `NF_RATE_MEDIAN` cell is yellow (an input left blank). Claude's call, not yet reviewed by me.
+- Figure a plots each year at July 1, with the rate events at their dates. Figure g shows six illustrative Medicare stays, with no durations, no dollar values and no `FigureData` block. My decisions.
+- Figure c's axis and caption say "nominal" dollars; to verify against the cost-report extract.
+- Figure captions are Claude's factual drafts, pending my review.
+- Build and check scripts are kept outside the repo, in my Research Paper folder (`model-build-scripts-v2`).
