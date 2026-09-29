@@ -9,16 +9,12 @@ against objections.
 
 ## Files
 
-- `spec.md`: data sources, models, figures, and success criteria for the
-  paper. Committed 2026-09-28; `status: built` with Audit findings added
-  2026-09-28. Its draft-marked values are still to be verified (decision 89)
-  before it moves to `audited`.
-- `model.xlsx`: the model built from `spec.md` (2026-09-28). It recalculates
-  fully on open and carries the engine's computed values. Every sheet,
-  including all 16 scenario runs, was evaluated with a formula engine (no
-  error cells; 45 of 45 worked-example anchors pass) and matches an
-  independent re-implementation of the spec. The spec's audit is still to
-  come.
+- `spec.md`: data sources, model, figures, and success criteria for the
+  paper. Rewritten 2026-09-28 for the problem-first brief (`status: draft`);
+  the spec for the superseded brief is in the repository history. Items
+  marked "(proposed)" await my approval.
+- `model.xlsx`: the model built 2026-09-28 from the superseded spec. To be
+  rebuilt from the new `spec.md` at the same path.
 - `README.md`: this file.
 
 Figures live in `analysis/figures/` (the assignment page names `figures/`;
@@ -29,4 +25,4 @@ kept under `analysis/` to match this repo's layout). Dated drafts live in
 
 | Engagement | Brief | Status |
 |---|---|---|
-| research-paper | `docs/briefs/research-brief.md` | First brief committed 2026-09-28, superseded 2026-09-29 by a problem-first brief at the same path (status committed); spec (`spec.md`, status built) and model (`model.xlsx`) were built on the superseded brief and are to be revised |
+| research-paper | `docs/briefs/research-brief.md` | First brief committed 2026-09-28, superseded 2026-09-29 by a problem-first brief at the same path (status committed); spec rewritten 2026-09-28 for the new brief (`spec.md`, status draft); model (`model.xlsx`) still from the superseded spec, to be rebuilt |
