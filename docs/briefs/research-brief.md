@@ -4,6 +4,7 @@ engagement: research-paper
 capability: economic-research
 date: 2026-09-28
 status: superseded
+superseded_by: "the problem-first brief committed at this same path on 2026-09-29"
 hypothesis: "About 150 transitional beds, funded by a hospital consortium under a state-enforced agreement and paired with a statewide rate rule, maximize system-wide net savings: each bed frees ~252 hospital days a year only while it can take patients stuck for lack of a bed that accepts Medicaid (up to 87 of the 191 waitlisted on Dec 31, 2023, ≈37,900 of 83,097 waitlist days), and past that the marginal bed mostly meets behavioral, special-care and guardianship cases it can't take, so its freed days fall off while its cost stays flat or rises; the first beds break even at an avoidable hospital cost of about $900 a day"
 ---
 
