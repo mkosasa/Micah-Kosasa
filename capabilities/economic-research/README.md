@@ -29,4 +29,4 @@ kept under `analysis/` to match this repo's layout). Dated drafts live in
 
 | Engagement | Brief | Status |
 |---|---|---|
-| research-paper | `docs/briefs/research-brief.md` | Brief committed (frozen) 2026-09-28; spec committed 2026-09-28 (`spec.md`, status built); model built and evaluated 2026-09-28 (`model.xlsx`); audit findings recorded, verification of draft values pending |
+| research-paper | `docs/briefs/research-brief.md` | First brief committed 2026-09-28, superseded 2026-09-29 by a problem-first brief at the same path (status committed); spec (`spec.md`, status built) and model (`model.xlsx`) were built on the superseded brief and are to be revised |
