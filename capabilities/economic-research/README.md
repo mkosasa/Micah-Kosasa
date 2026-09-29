@@ -10,11 +10,12 @@ against objections.
 ## Files
 
 - `spec.md`: data sources, model, figures, and success criteria for the
-  paper. Rewritten 2026-09-28 for the problem-first brief (`status: draft`);
-  the spec for the superseded brief is in the repository history. Items
-  marked "(proposed)" await my approval.
-- `model.xlsx`: the model built 2026-09-28 from the superseded spec. To be
-  rebuilt from the new `spec.md` at the same path.
+  paper. Rewritten 2026-09-28 for the problem-first brief; `status: built`
+  with Audit findings from the 2026-09-29 build. The spec for the
+  superseded brief is in the repository history.
+- `model.xlsx`: the model built 2026-09-29 from `spec.md` (sheets Inputs,
+  Waitlist, Cost, Tests, County, FigureData, Checks). Values are drafts
+  until I verify them against their sources.
 - `README.md`: this file.
 
 Figures live in `analysis/figures/` (the assignment page names `figures/`;
@@ -25,4 +26,4 @@ kept under `analysis/` to match this repo's layout). Dated drafts live in
 
 | Engagement | Brief | Status |
 |---|---|---|
-| research-paper | `docs/briefs/research-brief.md` | First brief committed 2026-09-28, superseded 2026-09-29 by a problem-first brief at the same path (status committed); spec rewritten 2026-09-28 for the new brief (`spec.md`, status draft); model (`model.xlsx`) still from the superseded spec, to be rebuilt |
+| research-paper | `docs/briefs/research-brief.md` | First brief committed 2026-09-28, superseded 2026-09-29 by a problem-first brief at the same path (status committed); spec rewritten 2026-09-28 for the new brief; model (`model.xlsx`) and figures a, b, c, d, g (`analysis/figures/`) built 2026-09-29, spec `status: built`; verification of values and review of figure captions pending |
