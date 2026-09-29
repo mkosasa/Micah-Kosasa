@@ -104,7 +104,7 @@ Reason columns drop the `REASON_` prefix to fit. In 2017 the reasons sum to 120 
 
 ## Structure
 
-(proposed: sheet layout derived by Claude from my decisions) One workbook, `capabilities/economic-research/model.xlsx`, replacing the old one:
+One workbook, `capabilities/economic-research/model.xlsx`, replacing the old one:
 
 | Sheet | Purpose |
 |---|---|
@@ -118,13 +118,11 @@ Reason columns drop the `REASON_` prefix to fit. In 2017 the reasons sum to 120 
 
 ## Calculation logic
 
-(proposed: formulas derived by Claude from my Purpose, conventions and test definitions; the definitions themselves are mine)
-
 ### Waitlist, by year (2017 to 2024)
 
 - `DAYS_PER_PT(y) = WL_DAYS(y) / WL_PATIENTS(y)`
 - `BENCH_TOTAL(y) = WL_PATIENTS(y) * BENCH_DAYS`
-- `EXCESS_DAYS(y) = MAX(0, WL_DAYS(y) - BENCH_TOTAL(y))` (proposed: floored at 0 in years at or under the benchmark)
+- `EXCESS_DAYS(y) = MAX(0, WL_DAYS(y) - BENCH_TOTAL(y))` (floored at 0 in years at or under the benchmark)
 - `WITHIN_DAYS(y) = WL_DAYS(y) - EXCESS_DAYS(y)` (figure d)
 - `EXCESS_SHARE(y) = EXCESS_DAYS(y) / WL_DAYS(y)`
 - `DAYS_IN_YEAR(y)` = 366 in leap years (2020, 2024), else 365
@@ -141,7 +139,7 @@ Reason columns drop the `REASON_` prefix to fit. In 2017 the reasons sum to 120 
 - `WL_RATE_AVG(y) = (WL_RATE_JAN(y) + WL_RATE_JUL(y)) / 2`
 - `NET_COST_LO(y) = AVOID_COST_LO - WL_RATE_AVG(y)`; `NET_COST_HI(y) = AVOID_COST_HI - WL_RATE_AVG(y)`
 - `EXCESS_COST_LO(y) = EXCESS_DAYS(y) * NET_COST_LO(y)`; `EXCESS_COST_HI(y) = EXCESS_DAYS(y) * NET_COST_HI(y)`
-- Current case: `NET_COST_LO_NOW = AVOID_COST_LO - WL_RATE_2026`, `NET_COST_HI_NOW = AVOID_COST_HI - WL_RATE_2026`; (proposed) `EXCESS_COST_LO_NOW` and `EXCESS_COST_HI_NOW` value `EXCESS_DAYS(2024)` at those net costs
+- Current case: `NET_COST_LO_NOW = AVOID_COST_LO - WL_RATE_2026`, `NET_COST_HI_NOW = AVOID_COST_HI - WL_RATE_2026`; `EXCESS_COST_LO_NOW` and `EXCESS_COST_HI_NOW` value `EXCESS_DAYS(2024)` at those net costs
 
 ### County (2023, 2024)
 
@@ -154,7 +152,7 @@ Reason columns drop the `REASON_` prefix to fit. In 2017 the reasons sum to 120 
   - `T1_DROP_2021 = SHARE_FINANCIAL(2020) - SHARE_FINANCIAL(2021)`
   - `T1_DROP_2024 = SHARE_FINANCIAL(2023) - SHARE_FINANCIAL(2024)`
   - `T1_PASS_2021 = T1_DROP_2021 * 100 >= T1_MIN_DROP_PTS`; `T1_PASS_2024` likewise
-  - (proposed wording) `T1_VERDICT` = "Falsified" if neither passes; "Not falsified" if either passes. If only `T1_PASS_2021` passes, add "weak (rests on the COVID-confounded 2021 comparison)"
+  - `T1_VERDICT` = "Falsified" if neither passes; "Not falsified" if either passes. If only `T1_PASS_2021` passes, add "weak (rests on the COVID-confounded 2021 comparison)"
 - Test 2, wait for the reset:
   - `T2_SLOPE` = least-squares slope of `DAYS_PER_PT(y)` on y, 2017 to 2023
   - `T2_VERDICT` = "Met" if `T2_SLOPE < 0`, else "Not met"
@@ -175,13 +173,11 @@ Reason columns drop the `REASON_` prefix to fit. In 2017 the reasons sum to 120 
 - **Test 3.** "Most years" means more than half of 2017 to 2024 (5 or more of 8). 2017 is counted on its recorded reasons and flagged. A tie for the largest reason counts as "not largest."
 - **Verdicts only.** The model reports each test's verdict. It does not rank or cost the options and does not choose between the add-on and the top-up.
 - **Dates on figure c.** Each fiscal year's cost is plotted at July 1 of that year; each rate at its memo's effective month. Cost lines stop at 2023; the rate line runs to 2026.
-- **Precision.** No rounding inside calculations. (proposed) Display days per patient to 1 decimal, shares to 0.1 point, beds to 1 decimal, dollars per day to cents, totals to whole dollars.
-- **Workbook formatting.** Every manual-input cell is filled yellow. Row headers and column headers are set apart by color: (proposed) dark blue fill with white bold text for column headers, light gray fill with bold text for row headers. Columns and row heights are sized so every value and label is fully visible (no `####`, no clipped text).
+- **Precision.** No rounding inside calculations. Display days per patient to 1 decimal, shares to 0.1 point, beds to 1 decimal, dollars per day to cents, totals to whole dollars.
+- **Workbook formatting.** Every manual-input cell is filled yellow. Row headers and column headers are set apart by color: dark blue fill with white bold text for column headers, light gray fill with bold text for row headers. Columns and row heights are sized so every value and label is fully visible (no `####`, no clipped text).
 - **Names.** Every defined name is absolute (the 2026-09-28 lesson from the old model). No calculation refers to a cell address where a name exists.
 
 ## Validation rules
-
-(proposed: rules and hand-check values derived by Claude from the draft inputs)
 
 Structural:
 
@@ -204,7 +200,7 @@ Hand checks (from the draft inputs):
 | `EXCESS_COST_LO(2024)`, `EXCESS_COST_HI(2024)` | about 1,539,057; about 17,320,737 |
 | `NET_COST_LO_NOW`, `NET_COST_HI_NOW` | 63.24, 983.24 |
 | `WL_DAYS_CHANGE_2024` | -26.7% |
-| `T1_DROP_2021`, `T1_DROP_2024` | -1.92 points, -11.12 points (both rises; unrounded, the 2021 rise is 1.9 points, not the 2.0 in decision tree v5 and the handoff, which came from rounded shares) |
+| `T1_DROP_2021`, `T1_DROP_2024` | -1.92 points, -11.12 points (both rises; unrounded, the 2021 rise is 1.9 points; see Errors caught, 2026-09-28) |
 | `T2_SLOPE` | about +1.88 days per patient per year |
 | `T3_YEARS` | 5 (2017 to 2021) |
 | `REASON_SUM(y) = DEC31_TOTAL(y)` | Every year except 2017 (120 vs 157) |
@@ -212,8 +208,6 @@ Hand checks (from the draft inputs):
 | `KFF_COST_DAY` x 0.15 and x 0.40 | 549.60 and 1,465.60, within rounding of `AVOID_COST_LO` and `AVOID_COST_HI` |
 
 ## Outputs
-
-(proposed: list derived by Claude from the Purpose)
 
 - By year, 2017 to 2024: `DAYS_PER_PT`, `WL_DAYS`, `EXCESS_DAYS`, `EXCESS_SHARE`, `EXCESS_BEDS`, `MEETS_BENCH`, the seven `SHARE_` values, `LTC_UNSTAFFED`, COVID flag.
 - 2023, 2024 and now: `WL_RATE_AVG`, `NET_COST_LO/HI`, `EXCESS_COST_LO/HI` (and the `_NOW` versions); `NF_SHARE_DEC31`; `WL_DAYS_CHANGE_2024`.
@@ -223,15 +217,13 @@ Hand checks (from the draft inputs):
 
 ### Figures
 
-Built from `FigureData` into `analysis/figures/` (PNG). (proposed) File names `fig-a-days-per-patient.png`, `fig-b-reason-shares.png`, `fig-c-cost-vs-rate.png`, `fig-d-excess-days.png`, `fig-g-opportunity-cost.png`. Every figure has a title, labeled axes with units, a source line, and a caption that reads on its own. No repository URL on any figure.
-
-(proposed: chart forms, markers and labels below are Claude's; the choice of figures, figure c's two cost lines and 2023 cutoff, figure g as a schematic and its caption point are mine)
+Built from `FigureData` into `analysis/figures/` (PNG). File names `fig-a-days-per-patient.png`, `fig-b-reason-shares.png`, `fig-c-cost-vs-rate.png`, `fig-d-excess-days.png`, `fig-g-opportunity-cost.png`. Every figure has a title, labeled axes with units, a source line, and a caption that reads on its own. No repository URL on any figure.
 
 | Fig | Content |
 |---|---|
 | a | `DAYS_PER_PT`, 2017 to 2024, as a line, with a horizontal line at `BENCH_DAYS` (14). Vertical markers at the rate events (`DATE_ADJ_2021`, `DATE_RESET_2024`). 2020 and 2021 marked COVID. |
 | b | The seven `SHARE_` values by year, 2017 to 2024, as 100% stacked bars. The two test 1 windows (Dec 2020 to Dec 2021, Dec 2023 to Dec 2024) shaded. 2017 labeled "recorded reasons only (120 of 157)". Carries tests 1 and 3. |
-| c | `NF_RATE_MEDIAN(d)` Jan 2016 to Jan 2026 (OPEN: step line or connected points; the series has no memo for Jan 2018, Jan 2020, Jan 2021 or Jul 2022 and no median for Jul 2019, and the Jan 13, 2021 adjustment first shows in the Jul 2021 memo, so a step line would sit flat past its own event marker). `NF_COST_MCD_HEAVY(fy)` and `NF_COST_ALL(fy)`, FY2011 to FY2023, as lines at July 1 of each year, stopping at 2023. Rate events marked. Note on the chart that the rate median covers all homes and the cost medians the stated groups. |
+| c | `NF_RATE_MEDIAN(d)` Jan 2016 to Jan 2026 as connected points at each memo's effective month. The line breaks wherever a scheduled January or July memo is missing or has no median (Jan 2018, Jul 2019, Jan 2020, Jan 2021, Jul 2022), so no value is drawn across a gap. `NF_COST_MCD_HEAVY(fy)` and `NF_COST_ALL(fy)`, FY2011 to FY2023, as lines at July 1 of each year, stopping at 2023. Rate events marked. Note on the chart that the rate median covers all homes and the cost medians the stated groups. |
 | d | `WL_DAYS` by year, 2017 to 2024, as stacked bars: `WITHIN_DAYS` and `EXCESS_DAYS`. |
 | g | Schematic, no dollar values: one bed's year as one long Medicaid stay, against the same bed turning over a run of short Medicare stays. The caption states that test 1 did not support this mechanism. |
 
