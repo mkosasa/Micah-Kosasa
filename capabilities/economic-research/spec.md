@@ -303,7 +303,7 @@ Rungs are ordered by `COST_YR(k)`, not by `K(k)`, because a cheaper space with a
 
 `R_CAP_2023` is the capital component price for the 2023 rate base, $22.50, already in 2023 dollars (Inputs, Price year). The grant uses it before the general excise tax, because the tax passes through to the state and the home keeps the $22.50; the operating test below uses it with the tax, to match the rate.
 
-The operating test and both forms of the rate rule run in nominal dollars, one row per rate year `t` from 2024 to `RULE_START + HORIZON - 1`. Decision 11 leaves the form to the analysis, so both are priced (decision 50):
+The operating test and both forms of the rate rule run in nominal dollars, one row per rate year `t` from 2024 to `RULE_START + HORIZON - 1`. The test counts only the years from `RULE_START`, since the rule cannot act before it starts; the 2024 to 2026 rows are kept for the drift and Figure 1 (decision 90). Decision 11 leaves the form to the analysis, so both are priced (decision 50):
 
     C_OP_NOM(t)     = C_OP x (1 + G_HI) ^ (t - 2023.5)            [FY2023 cost dated mid-2023]
     RATE_IDX(t)     = R_NF(t) for 2024 to 2026; after that
@@ -317,7 +317,7 @@ The operating test and both forms of the rate rule run in nominal dollars, one r
                                                                      both with the general excise tax]
     R_CAP_f(t)      = R_CAP(t) x (1 + GET_RATE) for 2024 to 2026; after that RATE_f(t) x CAP_SHARE
     OP_MARGIN(f, t) = RATE_f(t) - R_CAP_f(t) - C_OP_NOM(t)          [f = IDX, HIX, REB]
-    OP_FAIL_YEAR(f) = the first t with OP_MARGIN(f, t) < 0          ("none" if it never fails)
+    OP_FAIL_YEAR(f) = the first t >= RULE_START with OP_MARGIN(f, t) < 0   ("none" if it never fails)
 
 A rebase puts the rate back where the Jan 2024 reset put it relative to cost: the Jan 2024 rate grown at Hawaii cost growth. The Hawaii index only stops further drift from the Jan 2026 level, so a gap already open in 2026 stays open under it; the rebase closes the gap every `REBASE_YEARS`. All components move with the same index, so the capital component keeps its 2024 share of the rate after 2026.
 
@@ -452,7 +452,7 @@ Hypothesis tests, from the brief. Each has a required value, a tolerance and a P
 | Bed count | `HYP_BEDS` = 150 | ±25 beds (decision 9) | `BAND_LO <= BEDS <= BAND_HI` | Base; reported for every run. In the base (`PAST_POOL_PCT` = 0) a bed past the pool frees nothing, so `BEDS` is either 0 or the last whole bed inside the pool: the test checks whether any bed pays. The count moves only in the 0.25 and 0.5 runs |
 | First beds pay | Break-even of the first rung inside the range set in advance; distance from the $900 guess reported | None on the range, and none on the guess (decision 55): every rung's break-even is reported against $900 | `RANGE_LO <= BREAKEVEN(first rung used) <= RANGE_HI` | Base: converted space (rung 1), the brief's first beds. Every rung's break-even is reported against $900 |
 | Stay length | Break-even at 60- and 90-day stays; `STAY_FAIL` against the brief's 50 days; `LONG_STAY_FAIL` against `NF_LEVEL_SHARE` | None | FAIL for any stay length where `BREAKEVEN(first rung used) > RANGE_HI`. Flag "at risk" when `NF_LEVEL_SHARE(Y)` exceeds `LONG_STAY_FAIL` of the first rung used (decision 58) | `STAY_DAYS` 30, 60, 90; `Y` 2023 and 2024 |
-| Operating test | `OP_MARGIN(f, t) >= 0` in every year to the horizon, under a form of the rate rule | $0 | At least one form (f = HIX or REB) holds every year. `OP_FAIL_YEAR` is reported for the status quo and for each form | Base |
+| Operating test | `OP_MARGIN(f, t) >= 0` in every year from `RULE_START` to the horizon, under a form of the rate rule | $0 | At least one form (f = HIX or REB) holds every year. `OP_FAIL_YEAR` is reported for the status quo and for each form | Base |
 | No single hospital funds alone | `SOLO(i, k)` false: one hospital's share of a shared bed's net saving is below that bed's grant | None | False for every hospital at every rung used with a positive grant; a rung with no grant is reported n/a (decision 53) | Base |
 | Every hospital joins | `C_AVOID_H(i) >= JOIN_MIN` | None | For every consortium hospital | Base (every hospital at `C_AVOID`) and the stress run (one hospital at 550) |
 | Partnership vs. one-time increase | `UNIT_PART` below `UNIT_INC`: the partnership frees a waitlist day for less than a one-time increase | None | `UNIT_PART < UNIT_INC`. `UNIT_RULE` is reported alongside; since the rule costs about what an increase does per day, adding it can't flip the result (decision 54) | Base |
@@ -583,12 +583,12 @@ Audit of `model.xlsx` as built on 2026-09-28. Values marked draft in this spec a
 | Stay length, 90 days | 1,813.83 (2023); 2,141.91 (2024) | <= 1,470 | FAIL in both years |
 | `STAY_FAIL` | 72.94 days (2023); 61.77 days (2024) | brief: about 50 | Reported |
 | Stay length at risk | `NF_LEVEL_SHARE` 0.8220 vs `LONG_STAY_FAIL` 0.0837 (2023); 0.6936 vs 0.0619 (2024) | share <= threshold | At risk in both years. Table 19: 34 of 39 waiting for a care home (Dec 31, 2024) |
-| Operating test | First year with a negative margin: 2026 for the index only, the Hawaii index and the rebase | At least one rule form holds every year to the horizon | FAIL. See the note below |
+| Operating test | First year from 2027 with a negative margin: 2027 for the index only and the Hawaii index; 2029 for the rebase | At least one rule form holds every year from `RULE_START` to the horizon | FAIL. See the note below |
 | No single hospital funds alone | Converted space has no grant | False, or n/a with no grant | PASS (n/a) |
 | Every hospital joins | `JOIN_MIN` 454.72 (the grant is zero, so it equals `R_WAIT_2023`); every hospital at 1,010 | `C_AVOID_H` >= `JOIN_MIN` | PASS; the stress run (one hospital at 550) also passes |
 | Partnership vs. one-time increase | `UNIT_PART` 148.25 vs `UNIT_INC` 1,990.28 per waitlist day freed | `UNIT_PART` < `UNIT_INC` | PASS. `UNIT_RULE`: 2,337.98 (Hawaii index), 2,302.47 (rebase) |
 
-**Operating test note.** The spec's rows start in 2024 and `OP_FAIL_YEAR` is the first negative year, so the test can fail in years before the rule starts (2027). The margin (rate less the capital component with GET, less running cost excluding capital) is +6.20 (2024), +15.20 (2025) and -18.93 (2026) in every form. From 2027 the index-only form falls from -22.18 to -59.52 by 2034; the Hawaii index holds near -19 to -25; the rebase is positive in rebase years (+6.98 in 2027) but dips to about -0.11 to -0.14 in the last year of each cycle (2029, 2032, 2035). So counting from `RULE_START` would not make the test pass either. Whether the test should start at `RULE_START` is a spec decision for Micah.
+**Operating test note.** The test counts rate years from `RULE_START` (2027; decision 90). As first built, it counted from 2024, and every form failed in 2026, before the rule starts; the model was changed and re-evaluated (all five batches: no error cells, 0 mismatches with the re-implementation). The margin (rate less the capital component with GET, less running cost excluding capital) is +6.20 (2024), +15.20 (2025) and -18.93 (2026) in every form, before the rule. From 2027 the index-only form falls from -22.18 to -59.52 by 2034; the Hawaii index holds near -19 to -25, since it keeps the gap already open in 2026; the rebase is positive in rebase years (+6.98 in 2027) but dips to about -0.11 to -0.14 a day in the last year of each cycle (2029, 2032, 2035). So neither form holds every year.
 
 Other base outputs: `SHORTFALL` in 2034, 10.11%; `MCD_NET` 37,367.16 per bed-year (state 15,066.44, federal 22,300.72); `MAX_PREMIUM` 311.05 per occupied day (converted space); state-run hospitals' part of the consortium cost 0 (no grant); state-run share of 2023 waitlist days 28.1%.
 
@@ -596,22 +596,22 @@ Other base outputs: `SHORTFALL` in 2034, 10.11%; `MCD_NET` 37,367.16 per bed-yea
 
 | Run | BEDS | Stop | Break-even, first rung | Grant, first rung | UNIT_PART | UNIT_INC | UNIT_RULE HIX | UNIT_RULE REB | OP fail IDX / HIX / REB | Join all | Single hospital |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| BASE | 150 | pool | 604.61 | 0.00 | 148.25 | 1,990.28 | 2,337.98 | 2,302.47 | 2026 / 2026 / 2026 | yes | n/a |
-| CAVOID_LO | 0 | no bed pays | 604.61 | 0.00 | n/a (no beds) | 1,990.28 | 2,337.98 | 2,302.47 | 2026 / 2026 / 2026 | n/a (no beds) | n/a |
-| CAVOID_HI | 150 | pool | 604.61 | 0.00 | 148.25 | 1,990.28 | 2,337.98 | 2,302.47 | 2026 / 2026 / 2026 | yes | n/a |
-| NEWBUILD | 150 | pool | 637.64 | 1,560.12 | 154.44 | 1,990.28 | 2,708.10 | 2,653.18 | 2026 / 2026 / 2026 | yes | yes |
-| STRESS | 150 | pool | 604.61 | 0.00 | 148.25 | 1,990.28 | 2,337.98 | 2,302.47 | 2026 / 2026 / 2026 | yes | n/a |
-| MEDICARE | 150 | pool | 604.61 | 0.00 | -253.73 | 1,990.28 | 2,337.98 | 2,302.47 | 2026 / 2026 / 2026 | yes | n/a |
-| STAFFING | 150 | pool | 621.44 | 0.00 | 148.25 | 1,990.28 | 2,337.98 | 2,302.47 | 2024 / 2024 / 2024 | yes | n/a |
-| SR_SIMPLE | 150 | pool | 604.61 | 0.00 | 148.25 | 2,784.34 | 3,244.96 | 3,197.92 | 2026 / 2026 / 2026 | yes | n/a |
-| DISC_3 | 150 | pool | 604.86 | 0.00 | 148.25 | 1,990.28 | 2,331.45 | 2,294.32 | 2026 / 2026 / 2026 | yes | n/a |
-| DISC_7 | 150 | pool | 605.96 | 0.00 | 148.25 | 1,990.28 | 2,304.82 | 2,261.85 | 2026 / 2026 / 2026 | yes | n/a |
-| GIDX_30 | 150 | pool | 604.61 | 0.00 | 148.25 | 1,990.28 | 2,240.95 | 2,221.42 | 2026 / 2026 / 2026 | yes | n/a |
-| STAY_60 | 0 | no bed pays | 1,209.22 | 0.00 | n/a (no beds) | 1,990.28 | 2,337.98 | 2,302.47 | 2026 / 2026 / 2026 | n/a (no beds) | n/a |
-| STAY_90 | 0 | no bed pays | 1,813.83 | 0.00 | n/a (no beds) | 1,990.28 | 2,337.98 | 2,302.47 | 2026 / 2026 / 2026 | n/a (no beds) | n/a |
-| Y2024 | 150 | pool | 713.97 | 0.00 | 257.31 | 2,882.76 | 3,357.37 | 3,308.91 | 2026 / 2026 / 2026 | yes | n/a |
-| PPP_25 | 150 | pool | 604.61 | 0.00 | 148.25 | 1,990.28 | 2,337.98 | 2,302.47 | 2026 / 2026 / 2026 | yes | n/a |
-| PPP_50 | 150 | pool | 604.61 | 0.00 | 148.25 | 1,990.28 | 2,337.98 | 2,302.47 | 2026 / 2026 / 2026 | yes | n/a |
+| BASE | 150 | pool | 604.61 | 0.00 | 148.25 | 1,990.28 | 2,337.98 | 2,302.47 | 2027 / 2027 / 2029 | yes | n/a |
+| CAVOID_LO | 0 | no bed pays | 604.61 | 0.00 | n/a (no beds) | 1,990.28 | 2,337.98 | 2,302.47 | 2027 / 2027 / 2029 | n/a (no beds) | n/a |
+| CAVOID_HI | 150 | pool | 604.61 | 0.00 | 148.25 | 1,990.28 | 2,337.98 | 2,302.47 | 2027 / 2027 / 2029 | yes | n/a |
+| NEWBUILD | 150 | pool | 637.64 | 1,560.12 | 154.44 | 1,990.28 | 2,708.10 | 2,653.18 | 2027 / 2027 / 2029 | yes | yes |
+| STRESS | 150 | pool | 604.61 | 0.00 | 148.25 | 1,990.28 | 2,337.98 | 2,302.47 | 2027 / 2027 / 2029 | yes | n/a |
+| MEDICARE | 150 | pool | 604.61 | 0.00 | -253.73 | 1,990.28 | 2,337.98 | 2,302.47 | 2027 / 2027 / 2029 | yes | n/a |
+| STAFFING | 150 | pool | 621.44 | 0.00 | 148.25 | 1,990.28 | 2,337.98 | 2,302.47 | 2027 / 2027 / 2027 | yes | n/a |
+| SR_SIMPLE | 150 | pool | 604.61 | 0.00 | 148.25 | 2,784.34 | 3,244.96 | 3,197.92 | 2027 / 2027 / 2029 | yes | n/a |
+| DISC_3 | 150 | pool | 604.86 | 0.00 | 148.25 | 1,990.28 | 2,331.45 | 2,294.32 | 2027 / 2027 / 2029 | yes | n/a |
+| DISC_7 | 150 | pool | 605.96 | 0.00 | 148.25 | 1,990.28 | 2,304.82 | 2,261.85 | 2027 / 2027 / 2029 | yes | n/a |
+| GIDX_30 | 150 | pool | 604.61 | 0.00 | 148.25 | 1,990.28 | 2,240.95 | 2,221.42 | 2027 / 2027 / 2029 | yes | n/a |
+| STAY_60 | 0 | no bed pays | 1,209.22 | 0.00 | n/a (no beds) | 1,990.28 | 2,337.98 | 2,302.47 | 2027 / 2027 / 2029 | n/a (no beds) | n/a |
+| STAY_90 | 0 | no bed pays | 1,813.83 | 0.00 | n/a (no beds) | 1,990.28 | 2,337.98 | 2,302.47 | 2027 / 2027 / 2029 | n/a (no beds) | n/a |
+| Y2024 | 150 | pool | 713.97 | 0.00 | 257.31 | 2,882.76 | 3,357.37 | 3,308.91 | 2027 / 2027 / 2029 | yes | n/a |
+| PPP_25 | 150 | pool | 604.61 | 0.00 | 148.25 | 1,990.28 | 2,337.98 | 2,302.47 | 2027 / 2027 / 2029 | yes | n/a |
+| PPP_50 | 150 | pool | 604.61 | 0.00 | 148.25 | 1,990.28 | 2,337.98 | 2,302.47 | 2027 / 2027 / 2029 | yes | n/a |
 
 Dollar figures are per freed or waitlist day, 2023 dollars; grants are per bed-year. Notes: the single-hospital test fails in the new-building run (the largest hospital's planning share of one bed's net saving, 34,158, exceeds that rung's 1,560 grant). The past-pool runs (0.25, 0.5) leave the count at 150: a bed past the pool saves at most about 127,000 a year at 0.5, below its 152,394 cost. In the Medicare run Medicaid saves more on waitlisted days than it pays for the bed days, so `UNIT_PART` is negative.
 
