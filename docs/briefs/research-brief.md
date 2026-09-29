@@ -4,6 +4,7 @@ engagement: research-paper
 capability: economic-research
 date: 2026-09-29
 status: committed
+supersedes: "brief committed 2026-09-28 in PR #47"
 hypothesis: "Opportunity cost explains why homes deny beds to waitlisted Medicaid patients: a long-stay Medicaid patient holds a bed that could turn over short Medicare or private-pay stays at a higher margin, so when the Medicaid rate rises relative to other payers, the financial group on the waitlist shrinks"
 ---
 
@@ -23,7 +24,7 @@ The problem also falls on hospitals, which carry each waitlisted day at an avoid
 
 Where hospitals run full, the problem also falls on acute patients who can't get a bed. The HCR 161 report notes that waitlisted patients "at times" push emergency departments onto diversion. I make this claim only for hospitals that run full, because the evidence is weak: SHPDA's occupancy figure is an annual average of licensed beds, and it includes the waitlisted patients themselves.
 
-It matters now for two reasons: it isn't clear the 2024 improvement will last, and even with it the status quo is unacceptable. Waitlist days fell 27% in 2024, the first year under the January 2024 rate reset, but the average stayed above 14. The rate history is why I don't count on the improvement holding. The trouble is that the rate sat 19 to 29% below cost for years. The July 2021 add-on narrowed the gap, and only the January 2024 reset closed it. Since 2024 the method is again index-only, with no scheduled rebase. The median rate has gone from $481.83 at the reset to $495.25 now, about 1.4% a year, and that includes an unexplained drop in January 2026. The population is also aging, which should add demand, though I haven't pulled DBEDT's projections.
+It matters now for two reasons: it isn't clear the 2024 improvement will last, and even with it the status quo is unacceptable. Waitlist days fell 27% in 2024, the first year under the January 2024 rate reset, but the average stayed above 14. The rate history is why I don't count on the improvement holding. The trouble is that the median rate sat 19 to 29% below the median cost of Medicaid-heavy homes for years. A 12% adjustment for private homes (effective January 2021, first seen in the July 2021 rate memo) narrowed the gap, and only the January 2024 reset roughly closed it against the latest cost year, 2023. Since 2024 the method is again index-only, with no scheduled rebase. The median rate has gone from $481.83 at the reset to $495.25 now, about 1.4% a year, and that includes an unexplained drop in January 2026. The population is also aging, which should add demand, though I haven't pulled DBEDT's projections.
 
 **What is fixed** (from the data gathered so far):
 
@@ -47,7 +48,7 @@ A wrong choice costs something either way. If the Association waits and the rese
 - The patients waiting for a nursing-facility bed are mostly Medicaid or pending Medicaid. This is an assumption, not a finding, because no public source splits the waitlist by payer.
 - I leave Medicare patients out to keep the paper narrow. For them the hospital's loss per waitlisted day is larger, because Medicare pays per stay.
 - The Dec 31 mix of reasons represents the year. A one-day snapshot over-represents long waiters, so it roughly tracks each reason's share of waitlist days rather than of patients.
-- A waitlist day's avoidable cost is $550 to $1,470: what a hospital actually stops spending when a waitlisted patient leaves a day sooner. I set that range at 15 to 40% of the only published per-day figure I found, about $3,664 per adjusted inpatient day at Hawaii's nonprofit hospitals in 2023. That average includes overhead that doesn't go away when one low-acuity patient leaves.
+- A waitlist day's avoidable cost is $550 to $1,470: what a hospital actually stops spending when a waitlisted patient leaves a day sooner. I set that range at about 15 to 40% of the only published per-day figure I found, $3,664 per adjusted inpatient day at Hawaii's nonprofit hospitals in 2023 (KFF, from the AHA Annual Survey), rounded to $550 and $1,470. That average includes overhead that doesn't go away when one low-acuity patient leaves.
 - The problem is statewide. I report the county split as one row and don't analyze it.
 
 The one I'd most want to test if I had more time is that the waiting patients are mostly Medicaid or pending Medicaid. The mechanism rests on it, and so does the add-on. If many of these patients weren't on Medicaid, a low Medicaid rate couldn't explain their wait, and a Medicaid add-on wouldn't reach them. No public source splits the waitlist by payer, so for now I infer it from how Medicare and Medicaid pay for nursing-home care.
@@ -60,7 +61,7 @@ The data also has limits I can't remove:
 
 ## Hypothesis
 
-I expect opportunity cost to explain why homes deny beds to waitlisted Medicaid patients. A long-stay Medicaid patient holds a bed for months; the median Medicaid stay is about 543 days. The same bed could instead turn over a run of short Medicare or private-pay stays at a higher margin. Count that forgone margin as a cost, as economic profit does, and a home can lose by admitting a Medicaid patient even when the rate covers the cost of care. So a home facing a Medicaid rate that is low relative to other payers denies the bed. The patients it expects to keep longest are the ones it avoids most. That fits the HCR 161 report, which found homes "reluctant to take on patients who will face barriers to discharge."
+I expect opportunity cost to explain why homes deny beds to waitlisted Medicaid patients. A long-stay Medicaid patient holds a bed for months; the median of Hawaii homes' average Medicaid stays is about 543 days (CMS cost reports). The same bed could instead turn over a run of short Medicare or private-pay stays at a higher margin. Count that forgone margin as a cost, as economic profit does, and a home can lose by admitting a Medicaid patient even when the rate covers the cost of care. So a home facing a Medicaid rate that is low relative to other payers denies the bed. The patients it expects to keep longest are the ones it avoids most. That fits the HCR 161 report, which found homes "reluctant to take on patients who will face barriers to discharge."
 
 My prediction is that when the Medicaid rate rises relative to other payers, the financial group on the waitlist shrinks. In course terms, it is a claim about elasticity: homes' willingness to admit Medicaid patients should respond to the Medicaid price relative to other payers. I test it statewide. If it holds, it points toward the two options that change what a home earns from a hard-to-place Medicaid patient: the targeted add-on and the hospital-paid top-up. It points away from new transitional capacity, which adds beds without changing that trade-off. The data can't choose between the two, because both change what a home earns in the same way. The choice is a normative judgment about who should pay: the add-on puts the cost on Medicaid, shared with the federal government, and the top-up puts it on the hospitals that save.
 
@@ -70,16 +71,16 @@ I set these tests on Sep 28, before I pulled the 2017 to 2022 data, and wrote th
 
 Opportunity cost is wrong if the financial share of the Dec 31 waitlist fails to fall by at least 5 percentage points after both rate increases:
 
-- from Dec 2020 to Dec 2021, across the July 2021 add-on
+- from Dec 2020 to Dec 2021, across the 12% adjustment for private homes (effective January 2021)
 - from Dec 2023 to Dec 2024, across the January 2024 reset
 
-Both increases raised Medicaid relative to Medicare: the median Medicaid rate rose about 18% in July 2021 and 30% in January 2024, while Medicare's nursing-facility payment rose 1.2% for fiscal 2022 and 6.4% for fiscal 2024 (CMS final rules). I have no rate series for private pay.
+Both increases raised Medicaid relative to Medicare: the median Medicaid rate rose about 18% in July 2021 and 30% in January 2024, while Medicare's nursing-facility payment rose 1.2% for fiscal 2022 (from October 2021) and a net 4.2% for fiscal 2025 (from October 2024), the Medicare updates that fall inside each window (CMS final rules). I have no rate series for private pay.
 
 I read this leniently: the hypothesis fails only if the share falls short both times. COVID hit 2020 and 2021, so I flag both years, and the 2021 comparison is confounded.
 
 "Wait for the reset" wins if days per patient were already falling steadily toward 14 before 2024. In that case the wait was already closing on the benchmark before the reset, and no new action is needed.
 
-New transitional capacity wins if "no bed available" is the largest reason in most years from 2015 to 2024 (the data starts in 2017). In that case the limit is the number of beds, not homes' willingness to fill them with Medicaid patients.
+New transitional capacity wins if "no bed available" is the largest reason in most years from 2017 to 2024, the years SHPDA's waitlist table covers. In that case the limit is the number of beds, not homes' willingness to fill them with Medicaid patients.
 
 I would not consider the hypothesis wrong if the financial share falls by at least 5 points after either increase. A pass that rests on the 2021 comparison alone would still be weak, because COVID could have moved that year's share in either direction.
 
@@ -94,3 +95,15 @@ From SHPDA's utilization reports for 2017 to 2024 (Tables 2, 5, 16 and 18), I wi
 I will value the 2023 and 2024 days beyond the benchmark at the hospitals' net avoidable cost. That is $550 to $1,470 a day minus the average waitlisted rate for the matching year: about $293 for 2023 ($283.60 from January, $302.89 from July) and about $460 for 2024 ($464.97 from January, $455.59 from July). The January 2026 rate of $486.76 serves as the current case. I will also report the county split as one row and show unstaffed long-term-care beds (Table 16) as the staffing limit.
 
 The strongest objection I expect is that the financial group can't carry the main test. SHPDA doesn't define it. It mixes homes turning Medicaid patients away with patients waiting on an eligibility decision or a coverage problem, and a rate increase should shrink only the first. If the share doesn't fall, the mechanism may be wrong. Or eligibility and coverage cases may have grown enough to hide a fall in refusals. I looked for a definition in SHPDA's glossary, the 2025 survey form and the HCR 161 report and found none, so public data can't split the group. The test stands as set, and the paper reports this limit next to the result.
+
+## Corrections (2026-09-28)
+
+After a fact check of this brief, I corrected facts and wording without changing the hypothesis or what the tests test:
+
+- The Medicare comparator for the Dec 2023 to Dec 2024 window is fiscal 2025 (from October 2024, a net 4.2%), not fiscal 2024, which took effect in October 2023, before the window opened.
+- The 2021 rate change is named as the state plan's 12% adjustment for private homes, effective January 2021, in the "why now" paragraph and in test 1's first window. The window itself is unchanged.
+- The rate-cost gap is stated against the median cost of Medicaid-heavy homes, and the reset is said to have roughly closed it against 2023, the latest cost year.
+- The avoidable-cost range is labeled as rounded and its source (KFF, from the AHA Annual Survey) is named.
+- Test 3's window reads 2017 to 2024, the years SHPDA's waitlist table covers; the earlier "2015 to 2024" contradicted its own note that the data starts in 2017.
+- The 543-day figure is described as the median of Hawaii homes' average Medicaid stays, from CMS cost reports.
+- The frontmatter names the brief this one supersedes.
