@@ -364,3 +364,32 @@ Add to my verification list: the FY2023 cost-report periods (six reports run pas
 - Figure c's axis and caption say "nominal" dollars; to verify against the cost-report extract.
 - Figure captions are Claude's factual drafts, pending my review.
 - Build and check scripts are kept outside the repo, in my Research Paper folder (`model-build-scripts-v2`).
+
+### Lean audit build (2026-09-29)
+
+Rebuild by Claude Code after a model audit (findings kept outside the repo) and my decisions on it, trimmed to the lean set: the Checks split into regression anchors, invariants and error scans; the `WorkedExample` sheet and the owner's manual audit; verification columns on `Inputs`; the capacity ratio; test 1 on counts; condition (a); the cost-report-periods line. Branch `research-model-lean-audit`, from main at `24b0767`. No test, definition or verdict changed.
+
+**What was checked**
+
+| Check | Method | Result |
+|---|---|---|
+| Checks sheet | Evaluated by the `formulas` engine, then in Excel | ALL CHECKS reads ALL PASS; anchors matching 41 of 41; invariants I1 to I9 PASS; 10 error scans at 0. I opened the workbook in Excel: no errors, ALL PASS |
+| WorkedExample | Engine | 29 of 29 rows match (cases A to E, including the tie, the "weak" test 1 text and test 2 "Met") |
+| Calculation logic | Independent Python re-implementation from the scratch CSVs and this spec's literal market-basket values | 217 outputs, 0 mismatches |
+| Inputs | Every `Inputs` value against this spec's tables and values, including `MB_GROSS` | 158 comparisons, 0 differences |
+| Names | Explicit list from this spec | 87 names, all absolute: the 82 in this spec plus the 5 approved extras; none missing, none extra |
+| Typed values and fill | Script | Typed numbers only on `Inputs` and the `WorkedExample` inputs; every input yellow; no formula yellow |
+| Clipped text | Script estimate | 0 |
+| Owner's manual audit | Simulated in the engine on copies of the workbook, one step at a time | Every step as specified, with ALL CHECKS at ALL PASS throughout: step 1, excess days 7,287 (2023) and 0 (2024), capacity ratios blank, 10 anchors FAIL; step 2, "Not falsified", 41 of 41 anchors; step 3, 2023 a tie, `T3_YEARS` 5, `T1_DROP_2024` -11.84 points, `T1_OTHER_CHANGE_2024` -39, 3 anchors FAIL; step 4, `NET_COST_LO(2024)` 0, `EXCESS_COST_LO(2024)` 0, `NET_COST_LO_NOW` -26.48, 4 anchors FAIL. My own run in Excel is still to do |
+
+**What was found**
+
+- New outputs from the draft inputs: `CAP_RATIO(2024)` 11.69 and `CAP_RATIO_STAFF_2024` 7.53; test 1 on counts +13 and +32 (2020 to 2021), +15 and -33 (2023 to 2024); `RATE_GROWTH_2024_2026` 1.38% a year; `COST_FWD` $506.07 (FY2026) and $522.77 (FY2027); `COND_A_GAP` 2.14% and 3.95%. Verdicts unchanged: test 1 "Falsified", test 2 "Not met", test 3 "Met".
+- No calculation error found. The formulas engine treats a name that refers to its own range as circular, so `COST_FWD` multiplies the FY2023 base by the market-basket factors directly, and `RATE_FWD(2027)` looks up the January 2026 rate directly; the values are the same as a year-to-year chain.
+
+**What was done, and build conventions not stated above**
+
+- Verification columns sit in columns P to R of `Inputs` on every input row (58 rows), past the widest table, so the long source text stays readable; the count is at the top of `Inputs`.
+- Anchor results read FAIL, not an error, when a value is blank (for example the capacity ratios in manual-audit step 1), so a blank never trips an error scan.
+- The figures were not rebuilt: `FigureData` is unchanged, and its figure c rate slots were re-checked (0 mismatches).
+- Build and check scripts, extended, are in my Research Paper folder (`model-build-scripts-v2`, with `manual_audit.py`).
