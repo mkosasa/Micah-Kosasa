@@ -29,6 +29,7 @@ The model supports the Healthcare Association of Hawaii's decision on which opti
 | Medicaid State Plan Amendment HI-23-0014, Attachment 4.19-D | Rate-event dates (12% adjustment for private homes, effective Jan 13, 2021; Jan 2024 reset); index-only method since 2024 | https://www.medicaid.gov/sites/default/files/2024-02/HI-23-0014.pdf ; local `medicaid-SPA-HI-23-0014-NF-rate-method.pdf` |
 | CMS SNF cost reports, FY2011 to FY2023 (Worksheet A) | Median nursing-home cost per day, all facilities and Medicaid-heavy homes (figure c) | https://data.cms.gov/provider-compliance/cost-reports/skilled-nursing-facility-cost-report ; local `hi-snf-cost-per-day-series-2011-2023.csv`, `extract_hi_snf.py` |
 | CMS SNF PPS final rule fact sheets, FY2022 (CMS-1746-F) and FY2025 (CMS-1802-F) | Medicare comparators in the text only (+1.2%, net +4.2%); not model inputs | https://www.cms.gov/newsroom/fact-sheets/fiscal-year-fy-2022-skilled-nursing-facility-snf-prospective-payment-system-pps-final-rule-cms-1746 ; https://www.cms.gov/newsroom/fact-sheets/fiscal-year-2025-skilled-nursing-facility-prospective-payment-system-final-rule-cms-1802-f |
+| CMS SNF PPS final rule fact sheets, FY2024 (CMS-1779-F), FY2025 (CMS-1802-F), FY2026 (CMS-1827-F) and FY2027 (CMS-1843-F) | `MB_GROSS`: the SNF market basket before the forecast-error and productivity adjustments | https://www.cms.gov/newsroom/fact-sheets/fiscal-year-fy-2024-skilled-nursing-facility-perspective-payment-system-final-rule-cms-1779-f ; https://www.cms.gov/newsroom/fact-sheets/fiscal-year-2025-skilled-nursing-facility-prospective-payment-system-final-rule-cms-1802-f ; https://www.cms.gov/newsroom/fact-sheets/fy-2026-skilled-nursing-facility-snf-prospective-payment-system-final-rule-cms-1827-f ; https://www.cms.gov/newsroom/fact-sheets/fiscal-year-2027-skilled-nursing-facility-prospective-payment-system-final-rule-cms-1843-f |
 
 ## Inputs: the named contract
 
@@ -65,7 +66,7 @@ The model supports the Healthcare Association of Hawaii's decision on which opti
 | 2023 | 3,610 | 83,097 | 42 | 48 | 26 | 45 | 28 | 1 | 1 | 191 | 510 |
 | 2024 | 3,123 | 60,876 | 31 | 29 | 18 | 60 | 31 | 0 | 4 | 173 | 548 |
 
-Reason columns drop the `REASON_` prefix to fit. In 2017 the reasons sum to 120 against 157 by level of care (37 patients have no recorded reason; blank cells in the source).
+Reason columns drop the `REASON_` prefix to fit. In 2017 the reasons sum to 120 against 157 by level of care. Maui Memorial records reasons for 6 of its 47 patients (the other cells are blank, "data not available"), and Queen's Punchbowl's reasons sum to 43 against its total of 39.
 
 ### County (Table 18, hospital rows summed by county)
 
@@ -86,21 +87,21 @@ Reason columns drop the `REASON_` prefix to fit. In 2017 the reasons sum to 120 
 | `WL_RATE_JUL(y)` | 302.89 (2023), 455.59 (2024) | USD per waitlisted day | QI-2326 (Jul 2023), QI-2413 (Jul 2024) |
 | `WL_RATE_2026` | 486.76 | USD per waitlisted day | QI-2532 (Jan 2026), the current case |
 | `WL_RATE_LEAHI_2026` | 480.19 | USD per waitlisted day | QI-2532; reported as a note, not used in a calculation |
-| `MB_GROSS(fy)` | 3.0% (FY2024), 3.0% (FY2025), 3.3% (FY2026), 3.3% (FY2027) | percent a year | CMS SNF PPS final rules, FY2024 to FY2027: market basket increase before the forecast-error and productivity adjustments (values from my decision tree v4; to verify). A national Medicare index standing in for Hawaii nursing-home cost growth |
+| `MB_GROSS(fy)` | 3.0% (FY2024), 3.0% (FY2025), 3.3% (FY2026), 3.3% (FY2027) | percent a year | CMS SNF PPS final rule fact sheets, FY2024 to FY2027: market basket increase before the forecast-error and productivity adjustments. A national Medicare index standing in for Hawaii nursing-home cost growth |
 
 ### Rates and cost for figure c
 
 | Name | Value | Unit | Source |
 |---|---|---|---|
-| `NF_RATE_MEDIAN(d)` | Jan 2016 to Jan 2026, 17 memos (2019-07 has no median; left blank) | USD per day | Med-QUEST memos, `hi-medicaid-rate-series-2016-2026.csv` |
+| `NF_RATE_MEDIAN(d)` | Jan 2016 to Jan 2026, 17 memos (2019-07 left blank: QI-1911B, the controlling July 2019 memo, lists but omits its acuity rate table) | USD per day | Med-QUEST memos, `hi-medicaid-rate-series-2016-2026.csv` |
 | `NF_COST_ALL(fy)` | FY2011 to FY2023 (295.13 ... 519.16) | USD per patient day | CMS cost reports, median of all Hawaii facilities, `hi-snf-cost-per-day-series-2011-2023.csv` |
-| `NF_COST_MCD_HEAVY(fy)` | FY2011 to FY2023 (287.76 ... 461.78) | USD per patient day | Same file; Medicaid-heavy = at least 50% Medicaid days, excluding complex-care Kulana Malama and Islands Skilled (research notes; rule to verify against the extract) |
+| `NF_COST_MCD_HEAVY(fy)` | FY2011 to FY2023 (287.76 ... 461.79) | USD per patient day | Same file; Medicaid-heavy = Medicaid (Title XIX) days at least 50% of total days, excluding complex-care Kulana Malama (CCN 125057) and Islands Skilled Nursing and Rehab (CCN 125067). Cost per day = (Worksheet A salaries + other costs) / total days, each home's latest report in the file |
 
 ### Rate events and test settings
 
 | Name | Value | Unit | Source |
 |---|---|---|---|
-| `DATE_ADJ_2021` | 2021-01-13 | date | SPA HI-23-0014: 12% adjustment for private homes (first seen in the July 2021 memo) |
+| `DATE_ADJ_2021` | 2021-01-13 | date | SPA HI-23-0014, Attachment 4.19-D p. 38: 12% adjustment for private homes (first seen in the January 2021 memo, QI-2041) |
 | `DATE_RESET_2024` | 2024-01-01 | date | SPA HI-23-0014; QI-2342 |
 | `T1_MIN_DROP_PTS` | 5 | percentage points | Brief, test 1 |
 | `COVID_YEARS` | 2020, 2021 | years | Brief |
@@ -193,7 +194,8 @@ One workbook, `capabilities/economic-research/model.xlsx`, replacing the old one
 - **Excess days are a lower bound.** Excess days are measured against the average benchmark (total days minus patients x 14, floored at 0), not patient by patient. Because some patients wait beyond 14 days even in a year whose average is under 14, they are a lower bound on the days patients spent beyond 14, and the paper does not describe them as days patients waited beyond two weeks. `GAP_PER_PT` shows each year's signed margin.
 - **Days in the year.** Calendar days: 366 in 2020 and 2024.
 - **Reason shares.** The denominator is the sum of the seven recorded reasons (`REASON_SUM`), not the Dec 31 total by level of care. For 2017 that is 120, not 157.
-- **Year's waitlisted rate.** The simple average of the January and July rates.
+- **Year's waitlisted rate.** The simple average of the January and July rates. Each memo's rate is the waitlisted per diem that Attachment A prints for most hospitals. Hilo and Leahi had their own lower rates in the 2023 and 2024 memos, and Leahi in January 2026 (`WL_RATE_LEAHI_2026`).
+- **Rate medians.** Each memo's median is taken over every row of its acuity-based long-term-care rate table, including hospital-based and complex-care homes.
 - **Test 1.** Drop = the financial share on the earlier Dec 31 minus the share on the later Dec 31. Shares are compared unrounded. The hypothesis fails only if both drops fall short of 5 points (lenient reading, as in the brief). 2020 and 2021 are flagged for COVID, and the 2021 comparison is confounded.
 - **Test 2.** "Falling steadily toward 14" means the linear (least-squares) trend of days per patient over 2017 to 2023 slopes down.
 - **Test 3.** "Most years" means more than half of 2017 to 2024 (5 or more of 8). 2017 is counted on its recorded reasons and flagged. A tie for the largest reason counts as "not largest."
@@ -203,7 +205,7 @@ One workbook, `capabilities/economic-research/model.xlsx`, replacing the old one
 - **Condition (a).** Cost is carried forward at the gross CMS SNF market basket, a national Medicare index standing in for Hawaii nursing-home cost growth, and the rate at its 2024 to 2026 pace. The gap is 1 - rate / cost. Cost is dated July 1 of the fiscal year and the rate January, a half-year mismatch. The condition describes what the model computes under stated assumptions; it is not a forecast, and the model does not rank or cost the options.
 - **Dates on figure c.** Each fiscal year's cost is plotted at July 1 of that year; each rate at its memo's effective month. Cost lines stop at 2023; the rate line runs to 2026.
 - **Cost-report periods.** Each CMS fiscal-year file holds 12-month reports whose periods vary by facility; in every year from FY2011 to FY2023, 5 to 8 reports run into the following calendar year. In FY2023, six reports (857 beds) run past the January 2024 reset. The model uses each file as published.
-- **Precision.** No rounding inside calculations. Display days per patient to 1 decimal, shares to 0.1 point, beds to 1 decimal, dollars per day to cents, totals to whole dollars.
+- **Precision.** No rounding inside calculations. Input medians (rate and cost) are taken on unrounded values and rounded half up to the cent. Display days per patient to 1 decimal, shares to 0.1 point, beds to 1 decimal, dollars per day to cents, totals to whole dollars.
 - **Workbook formatting.** Every manual-input cell is filled yellow. Row headers and column headers are set apart by color: dark blue fill with white bold text for column headers, light gray fill with bold text for row headers. Columns and row heights are sized so every value and label is fully visible (no `####`, no clipped text).
 - **Names.** Every defined name is absolute (the 2026-09-28 lesson from the old model). No calculation refers to a cell address where a name exists. One exception: an error scan on the `Checks` sheet may refer to a sheet's cell range even where the range contains named cells. The `WorkedExample` sheet has no defined names; its formulas refer to its own cells.
 
@@ -263,7 +265,7 @@ Hand checks (regression anchors, from the draft inputs; expected to change when 
 | `T1_FIN_CHANGE_2021`, `T1_OTHER_CHANGE_2021` | +13; +32 |
 | `T1_FIN_CHANGE_2024`, `T1_OTHER_CHANGE_2024` | +15; -33 |
 | `RATE_GROWTH_2024_2026` | +1.38% a year |
-| `COST_FWD(2026)`, `COST_FWD(2027)` | $506.07; $522.77 |
+| `COST_FWD(2026)`, `COST_FWD(2027)` | $506.08; $522.78 |
 | `COND_A_GAP(2026)`, `COND_A_GAP(2027)` | 2.14%; 3.95% |
 
 (The table's current rows become 30 anchor rows on the `Checks` sheet; the two county-sum rows move to invariant I4. The new rows add 11 anchors, one per value: 41 in all.)
@@ -308,7 +310,7 @@ Built from `FigureData` into `analysis/figures/` (PNG). File names `fig-a-days-p
 |---|---|
 | a | `DAYS_PER_PT`, 2017 to 2024, as a line, with a horizontal line at `BENCH_DAYS` (14). Vertical markers at the rate events (`DATE_ADJ_2021`, `DATE_RESET_2024`). 2020 and 2021 marked COVID. |
 | b | The seven `SHARE_` values by year, 2017 to 2024, as 100% stacked bars. The two test 1 windows (Dec 2020 to Dec 2021, Dec 2023 to Dec 2024) shaded. 2017 labeled "recorded reasons only (120 of 157)". Carries tests 1 and 3. |
-| c | `NF_RATE_MEDIAN(d)` Jan 2016 to Jan 2026 as connected points at each memo's effective month. The line breaks wherever a scheduled January or July memo is missing or has no median (Jan 2018, Jul 2019, Jan 2020, Jan 2021, Jul 2022), so no value is drawn across a gap. `NF_COST_MCD_HEAVY(fy)` and `NF_COST_ALL(fy)`, FY2011 to FY2023, as lines at July 1 of each year, stopping at 2023. Rate events marked. Note on the chart that the rate median covers all homes and the cost medians the stated groups. |
+| c | `NF_RATE_MEDIAN(d)` Jan 2016 to Jan 2026 as connected points at each memo's effective month. The line breaks at every January or July slot not in the rate series, so no value is drawn across a gap: Jan 2018 and Jan 2020 (the memo index lists no acuity rate table), Jul 2019 (QI-1911B omits its table), and Jan 2021 and Jul 2022 (QI-2041 and QI-2210 print tables, not collected in the series). `NF_COST_MCD_HEAVY(fy)` and `NF_COST_ALL(fy)`, FY2011 to FY2023, as lines at July 1 of each year, stopping at 2023. Rate events marked. Note on the chart that the rate median covers all homes and the cost medians the stated groups. |
 | d | `WL_DAYS` by year, 2017 to 2024, as stacked bars: `WITHIN_DAYS` and `EXCESS_DAYS`. |
 | g | Schematic, no dollar values: one bed's year as one long Medicaid stay, against the same bed turning over a run of short Medicare stays. The caption states that test 1 did not support this mechanism. |
 
@@ -393,3 +395,7 @@ Rebuild by Claude Code after a model audit (findings kept outside the repo) and 
 - Anchor results read FAIL, not an error, when a value is blank (for example the capacity ratios in manual-audit step 1), so a blank never trips an error scan.
 - The figures were not rebuilt: `FigureData` is unchanged, and its figure c rate slots were re-checked (0 mismatches).
 - Build and check scripts, extended, are in my Research Paper folder (`model-build-scripts-v2`, with `manual_audit.py`).
+
+### Input verification (2026-09-29)
+
+I verified the inputs against their primary sources, with Claude Code finding and opening each source and re-deriving derived values. Four values were wrong by one cent and are corrected: the January 2026 rate median (495.25 to 495.26; the median 495.255 had been rounded down) and three cost medians (FY2014 all facilities 344.18 to 344.19, FY2015 Medicaid-heavy 322.11 to 322.10, FY2023 Medicaid-heavy 461.78 to 461.79; the build had taken medians of values already rounded to the cent). The `COST_FWD` anchors moved to $506.08 and $522.78. No test, definition or verdict changed. My verification entries are on `Inputs`, columns P to R.
