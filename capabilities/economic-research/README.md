@@ -5,7 +5,8 @@ analyzing its implications, and recommending a policy or strategy defended
 against objections.
 
 **Exercised in:** research paper (`docs/briefs/research-brief.md`,
-`capabilities/economic-research/spec.md`, `analysis/research-paper.pdf`)
+`capabilities/economic-research/spec.md`, `drafts/`,
+`analysis/research-paper.pdf`)
 
 ## Files
 
