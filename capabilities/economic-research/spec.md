@@ -34,6 +34,8 @@ The model supports the Healthcare Association of Hawaii's decision on which opti
 
 `(y)` is one value per year, `(c,y)` per county and year, `(fy)` per CMS fiscal year, `(d)` per memo effective month. Each series is a named column in a year table. Every input cell is filled yellow (Conventions).
 
+**Verification columns.** Every input row on `Inputs` carries three yellow manual columns, "Source page", "Verified by" and "Date verified", which I fill in as I verify each value against its source. A cell at the top of `Inputs` counts the rows with a date.
+
 ### Waitlist (SHPDA Table 18)
 
 | Name | Value | Unit | Source |
@@ -84,6 +86,7 @@ Reason columns drop the `REASON_` prefix to fit. In 2017 the reasons sum to 120 
 | `WL_RATE_JUL(y)` | 302.89 (2023), 455.59 (2024) | USD per waitlisted day | QI-2326 (Jul 2023), QI-2413 (Jul 2024) |
 | `WL_RATE_2026` | 486.76 | USD per waitlisted day | QI-2532 (Jan 2026), the current case |
 | `WL_RATE_LEAHI_2026` | 480.19 | USD per waitlisted day | QI-2532; reported as a note, not used in a calculation |
+| `MB_GROSS(fy)` | 3.0% (FY2024), 3.0% (FY2025), 3.3% (FY2026), 3.3% (FY2027) | percent a year | CMS SNF PPS final rules, FY2024 to FY2027: market basket increase before the forecast-error and productivity adjustments (values from my decision tree v4; to verify). A national Medicare index standing in for Hawaii nursing-home cost growth |
 
 ### Rates and cost for figure c
 
@@ -111,10 +114,13 @@ One workbook, `capabilities/economic-research/model.xlsx`, replacing the old one
 | `Inputs` | Every input above, yellow; scalar inputs in a Name, Value, Unit, Source table; year-indexed inputs in one year table; county, rate and cost series in their own tables |
 | `Waitlist` | Year table 2017 to 2024: days per patient, benchmark days, excess days, beds, reason shares, flags |
 | `Cost` | 2023, 2024 and the current case: average waitlisted rate, net cost per day (low, high), cost of excess days |
-| `Tests` | The three tests, each with its inputs, result and verdict |
+| `Tests` | The three tests, each with its inputs, result and verdict; then a side diagnostic (test 1 on counts) that changes no verdict |
 | `County` | Days per patient and share of days by county, 2023 and 2024 |
+| `Capacity` | Excess beds against unstaffed long-term-care beds, 2017 to 2024: a scale comparison, not a sizing |
+| `Conditions` | Condition (a): cost carried forward at the gross CMS SNF market basket against the rate at its post-reset pace |
 | `FigureData` | The exact series each figure plots |
-| `Checks` | Validation rules below, each PASS or FAIL |
+| `WorkedExample` | A synthetic anchor with its own yellow inputs, not linked to `Inputs`, run through the same formula shapes as the model, with an expected column and a match column |
+| `Checks` | Regression anchors, invariants and error scans (Validation rules), with an ALL CHECKS cell and a count of anchors matching |
 
 ## Calculation logic
 
@@ -147,6 +153,18 @@ One workbook, `capabilities/economic-research/model.xlsx`, replacing the old one
 - `CTY_DAYS_PER_PT(c,y) = CTY_DAYS(c,y) / CTY_PATIENTS(c,y)`
 - `CTY_DAY_SHARE(c,y) = CTY_DAYS(c,y) / WL_DAYS(y)`
 
+### Capacity (2017 to 2024)
+
+- `CAP_RATIO(y) = LTC_UNSTAFFED(y) / EXCESS_BEDS(y)`, unstaffed long-term-care beds per excess bed; blank in years with no excess beds, so no division by zero
+- `CAP_RATIO_STAFF_2024 = LTC_UNSTAFFED_STAFF_2024 / EXCESS_BEDS(2024)`, the same against the beds unstaffed for lack of staff; blank if `EXCESS_BEDS(2024)` is 0
+
+### Condition (a)
+
+- `RATE_GROWTH_2024_2026 = (NF_RATE_MEDIAN(Jan 2026) / NF_RATE_MEDIAN(Jan 2024)) ^ (1/2) - 1`, the post-reset pace, compounded over two years
+- `COST_FWD(fy)`, FY2024 to FY2027: `NF_COST_MCD_HEAVY(2023)` carried forward, each year times (1 + `MB_GROSS(fy)`)
+- `RATE_FWD(2026)` = `NF_RATE_MEDIAN(Jan 2026)`; `RATE_FWD(2027) = RATE_FWD(2026) x (1 + RATE_GROWTH_2024_2026)`
+- `COND_A_GAP(fy) = 1 - RATE_FWD(fy) / COST_FWD(fy)`, FY2026 and FY2027
+
 ### Tests (definitions in Conventions)
 
 - Test 1, opportunity cost:
@@ -162,6 +180,12 @@ One workbook, `capabilities/economic-research/model.xlsx`, replacing the old one
   - `T3_YEARS = COUNT(y where LARGEST_REASON(y) = no bed)`, 2017 to 2024
   - `T3_VERDICT` = "Met" if `T3_YEARS > 8 / 2` (5 or more of 8), else "Not met"; 2017 carries `FLAG_2017_INCOMPLETE`
 
+### Side diagnostic: test 1 on counts (changes no verdict)
+
+- `T1_FIN_CHANGE_2021 = REASON_FINANCIAL(2021) - REASON_FINANCIAL(2020)`
+- `T1_OTHER_CHANGE_2021 = (REASON_SUM(2021) - REASON_FINANCIAL(2021)) - (REASON_SUM(2020) - REASON_FINANCIAL(2020))`
+- `T1_FIN_CHANGE_2024` and `T1_OTHER_CHANGE_2024` likewise, 2023 to 2024
+
 ## Conventions
 
 - **Definitions set after results.** I locked the three tests on Sep 28, before pulling the 2017 to 2022 data. I set the definitions below on Sep 28, after I had seen the results. The paper says so.
@@ -173,23 +197,49 @@ One workbook, `capabilities/economic-research/model.xlsx`, replacing the old one
 - **Test 1.** Drop = the financial share on the earlier Dec 31 minus the share on the later Dec 31. Shares are compared unrounded. The hypothesis fails only if both drops fall short of 5 points (lenient reading, as in the brief). 2020 and 2021 are flagged for COVID, and the 2021 comparison is confounded.
 - **Test 2.** "Falling steadily toward 14" means the linear (least-squares) trend of days per patient over 2017 to 2023 slopes down.
 - **Test 3.** "Most years" means more than half of 2017 to 2024 (5 or more of 8). 2017 is counted on its recorded reasons and flagged. A tie for the largest reason counts as "not largest."
+- **Side diagnostic.** Test 1 on counts describes the data around test 1. It is not a test: it has no verdict, changes no verdict, and was not part of the tests I locked on Sep 28. I chose it on Sep 29, after the results were known.
 - **Verdicts only.** The model reports each test's verdict. It does not rank or cost the options and does not choose between the add-on and the top-up.
+- **Capacity comparison.** The `Capacity` sheet compares scale; it does not size or cost an option. Three limits go beside it: (1) excess beds cover the acute waitlist across all levels of care on an average day, while unstaffed beds are long-term-care beds on Dec 31, so this is not a bed-for-bed match; (2) reopening beds idle for lack of staff is a workforce lever outside my scope, while my capacity option is new transitional capacity; (3) excess days are a lower bound, so excess beds are too.
+- **Condition (a).** Cost is carried forward at the gross CMS SNF market basket, a national Medicare index standing in for Hawaii nursing-home cost growth, and the rate at its 2024 to 2026 pace. The gap is 1 - rate / cost. Cost is dated July 1 of the fiscal year and the rate January, a half-year mismatch. The condition describes what the model computes under stated assumptions; it is not a forecast, and the model does not rank or cost the options.
 - **Dates on figure c.** Each fiscal year's cost is plotted at July 1 of that year; each rate at its memo's effective month. Cost lines stop at 2023; the rate line runs to 2026.
+- **Cost-report periods.** Each CMS fiscal-year file holds 12-month reports whose periods vary by facility; in every year from FY2011 to FY2023, 5 to 8 reports run into the following calendar year. In FY2023, six reports (857 beds) run past the January 2024 reset. The model uses each file as published.
 - **Precision.** No rounding inside calculations. Display days per patient to 1 decimal, shares to 0.1 point, beds to 1 decimal, dollars per day to cents, totals to whole dollars.
 - **Workbook formatting.** Every manual-input cell is filled yellow. Row headers and column headers are set apart by color: dark blue fill with white bold text for column headers, light gray fill with bold text for row headers. Columns and row heights are sized so every value and label is fully visible (no `####`, no clipped text).
-- **Names.** Every defined name is absolute (the 2026-09-28 lesson from the old model). No calculation refers to a cell address where a name exists.
+- **Names.** Every defined name is absolute (the 2026-09-28 lesson from the old model). No calculation refers to a cell address where a name exists. One exception: an error scan on the `Checks` sheet may refer to a sheet's cell range even where the range contains named cells. The `WorkedExample` sheet has no defined names; its formulas refer to its own cells.
 
 ## Validation rules
 
 Structural:
 
-- Every calculated cell is a formula; only `Inputs` holds typed values.
+- Every calculated cell is a formula; only `Inputs` (including its verification columns) and the `WorkedExample` anchor inputs hold typed values. Expected values in `Checks` and `WorkedExample` are constants inside formulas.
 - No error cells anywhere.
 - Every name in this spec exists in the workbook as an absolute defined name, and no other names exist.
-- Every input cell is yellow; no calculated cell is yellow.
-- The workbook opens in Excel with no errors, and every `Checks` row reads PASS.
+- Every input cell (on `Inputs`, including the verification columns, and the `WorkedExample` anchor inputs) is yellow; no calculated cell is yellow.
+- The workbook opens in Excel with no errors, the ALL CHECKS cell reads ALL PASS, and, with the draft inputs as built, every regression anchor matches.
 
-Hand checks (from the draft inputs):
+The `Checks` sheet has three groups.
+
+**Regression anchors.** The hand checks below, each against a fixed expected value from the draft inputs. They are expected to change when I correct an input during verification; after a correction I re-derive the expected value. They are not part of ALL CHECKS. A cell shows "Anchors matching: n of 41."
+
+**Invariants.** These must pass for any inputs. One row each; a row that covers years passes only if it holds in every year.
+
+| # | Invariant |
+|---|---|
+| I1 | For each year 2017 to 2024, the seven `SHARE_` values sum to 1 |
+| I2 | For each year, `WITHIN_DAYS + EXCESS_DAYS = WL_DAYS` |
+| I3 | For each year, `EXCESS_DAYS = MAX(0, GAP_PER_PT x WL_PATIENTS)` (this covers the 2019 and 2022 excess days, which are not anchored) |
+| I4 | For 2023 and 2024, the county `CTY_DAYS(c,y)` sum to `WL_DAYS(y)` |
+| I5 | For 2023 and 2024, the county `CTY_DAY_SHARE(c,y)` sum to 1 |
+| I6 | `T2_SLOPE` equals the least-squares slope written out by hand over 2017 to 2023: the sum of (year minus mean year) x (days per patient minus mean) over the sum of (year minus mean year) squared |
+| I7 | `T3_YEARS` equals the count of years in which `REASON_NO_BED` is greater than each of the other six reasons, recomputed from the counts |
+| I8 | For each year, `MEETS_BENCH` is TRUE exactly when `GAP_PER_PT <= 0` |
+| I9 | Every row of the `WorkedExample` sheet reads "match" |
+
+**Error scans.** One row per sheet counting error values in that sheet's used range: `Inputs`, `Waitlist`, `Cost`, `Tests`, `County`, `Capacity`, `Conditions`, `FigureData`, `WorkedExample`, and `Checks` (the rows above the scan, so the scan does not refer to itself). Each passes at 0.
+
+**ALL CHECKS.** One cell: "ALL PASS" when every invariant and every error scan reads PASS; otherwise "REVIEW". Tolerance for invariants is 1e-6.
+
+Hand checks (regression anchors, from the draft inputs; expected to change when an input is corrected). The two `KFF_COST_DAY` x 0.15 and x 0.40 rows check arithmetic on the input, not the model; they stay as anchors.
 
 | Check | Expected |
 |---|---|
@@ -209,6 +259,35 @@ Hand checks (from the draft inputs):
 | `REASON_SUM(y) = DEC31_TOTAL(y)` | Every year except 2017 (120 vs 157) |
 | Sum of `CTY_DAYS(c,y)` = `WL_DAYS(y)` | 2023 and 2024 |
 | `KFF_COST_DAY` x 0.15 and x 0.40 | 549.60 and 1,465.60, within rounding of `AVOID_COST_LO` and `AVOID_COST_HI` |
+| `CAP_RATIO(2024)`, `CAP_RATIO_STAFF_2024` | 11.69 (548 / 46.87); 7.53 (353 / 46.87) |
+| `T1_FIN_CHANGE_2021`, `T1_OTHER_CHANGE_2021` | +13; +32 |
+| `T1_FIN_CHANGE_2024`, `T1_OTHER_CHANGE_2024` | +15; -33 |
+| `RATE_GROWTH_2024_2026` | +1.38% a year |
+| `COST_FWD(2026)`, `COST_FWD(2027)` | $506.07; $522.77 |
+| `COND_A_GAP(2026)`, `COND_A_GAP(2027)` | 2.14%; 3.95% |
+
+(The table's current rows become 30 anchor rows on the `Checks` sheet; the two county-sum rows move to invariant I4. The new rows add 11 anchors, one per value: 41 in all.)
+
+**WorkedExample anchor.** The `WorkedExample` sheet has its own yellow inputs (not linked to `Inputs`), including its own benchmark (14) and test 1 threshold (5 points). Each case runs through the same formula shapes as the model and compares every result with the expected value below.
+
+| Case | Inputs | Expected |
+|---|---|---|
+| A. Rising series | Years 1 to 3; 100 patients each year; days 1,000, 1,400, 2,000 | Days per patient 10, 14, 20; signed gap -4, 0, +6; excess days 0, 0, 600; days within 1,000, 1,400, 1,400; meets benchmark TRUE, TRUE, FALSE (14 exactly meets); slope +5.0; test 2 "Not met" |
+| B. Falling series | Same patients; days 2,000, 1,400, 1,000 | Days per patient 20, 14, 10; slope -5.0; test 2 "Met" |
+| C. Largest reason, tie | Reason counts: no bed 5, behavior 5, special care 2, financial 3, guardianship 1, PASARR 0, other 1 | "Tie (none largest)" |
+| D. Largest reason, no tie | Same, with no bed 6 | "No bed" |
+| E. Test 1 truth table | Drops in points (2021 window, 2024 window): (6, 6); (6, -2); (-2, 6); (-2, -2); (5.00, -2) | "Not falsified"; "Not falsified; weak (rests on the COVID-confounded 2021 comparison)"; "Not falsified"; "Falsified"; the "weak" text (a drop of exactly 5.00 points passes) |
+
+Case E feeds the drops straight into the verdict formula; the share-to-drop step is covered by the regression anchors.
+
+**Owner's manual audit.** I run these in Excel, reset the input after each step, and record the results in Audit findings. In every step the ALL CHECKS cell should still read ALL PASS; anchors that depend on the changed input FAIL, as they should.
+
+| Step | Set | Expected |
+|---|---|---|
+| 1 | `BENCH_DAYS` = 21 | `EXCESS_DAYS(2023)` = 7,287; `EXCESS_DAYS(2024)` = 0; `CAP_RATIO(2024)` and `CAP_RATIO_STAFF_2024` blank; anchors on excess days, beds, gap, cost and capacity FAIL |
+| 2 | `T1_MIN_DROP_PTS` = -12 | Both windows pass; `T1_VERDICT` = "Not falsified" (not the "weak" text, since both pass); all anchors match |
+| 3 | `REASON_NO_BED(2023)` = 48 | 2023 `LARGEST_REASON` = "Tie (none largest)"; `T3_YEARS` stays 5; `T1_DROP_2024` = -11.84 points; `T1_OTHER_CHANGE_2024` = -39; the reasons-total, `T1_DROP_2024` and `T1_OTHER_CHANGE_2024` anchors FAIL |
+| 4 | `AVOID_COST_LO` = 460.28 | `NET_COST_LO(2024)` = 0; `EXCESS_COST_LO(2024)` = 0; `NET_COST_LO_NOW` = -26.48; the low-cost anchors and the `AVOID_COST_LO` rounding anchor FAIL |
 
 ## Outputs
 
@@ -217,6 +296,9 @@ Hand checks (from the draft inputs):
 - County row: `CTY_DAYS_PER_PT(c,y)` and `CTY_DAY_SHARE(c,y)`, 2023 and 2024.
 - Tests: `T1_DROP_2021`, `T1_DROP_2024`, `T1_VERDICT`; `T2_SLOPE`, `T2_VERDICT`; `LARGEST_REASON(y)`, `T3_YEARS`, `T3_VERDICT`.
 - Staffing note: `LTC_UNSTAFFED(2024)` and `LTC_UNSTAFFED_STAFF_2024`.
+- Capacity: `CAP_RATIO(y)` for 2019, 2022, 2023 and 2024, `CAP_RATIO_STAFF_2024`, and the three limits.
+- Side diagnostic: `T1_FIN_CHANGE_2021`, `T1_OTHER_CHANGE_2021`, `T1_FIN_CHANGE_2024`, `T1_OTHER_CHANGE_2024`.
+- Condition (a): `RATE_GROWTH_2024_2026`; `COST_FWD(fy)`, `RATE_FWD(fy)` and `COND_A_GAP(fy)` for FY2026 and FY2027.
 
 ### Figures
 
@@ -249,6 +331,8 @@ A finished paper:
 
 Build of 2026-09-29, by Claude Code from this spec (main at `3641f5d`), on branch `research-model-build`. Every value is still a draft until I verify it against its source (the SHPDA counts, the OCR rate medians, the 2017 reason totals, the Medicaid-heavy rule, $3,664, the 543 days, the CAH share).
 
+Add to my verification list: the FY2023 cost-report periods (six reports run past the January 2024 reset); the market-basket values in `MB_GROSS`.
+
 ### What was checked
 
 | Check | Method | Result |
@@ -280,3 +364,32 @@ Build of 2026-09-29, by Claude Code from this spec (main at `3641f5d`), on branc
 - Figure c's axis and caption say "nominal" dollars; to verify against the cost-report extract.
 - Figure captions are Claude's factual drafts, pending my review.
 - Build and check scripts are kept outside the repo, in my Research Paper folder (`model-build-scripts-v2`).
+
+### Lean audit build (2026-09-29)
+
+Rebuild by Claude Code after a model audit (findings kept outside the repo) and my decisions on it, trimmed to the lean set: the Checks split into regression anchors, invariants and error scans; the `WorkedExample` sheet and the owner's manual audit; verification columns on `Inputs`; the capacity ratio; test 1 on counts; condition (a); the cost-report-periods line. Branch `research-model-lean-audit`, from main at `24b0767`. No test, definition or verdict changed.
+
+**What was checked**
+
+| Check | Method | Result |
+|---|---|---|
+| Checks sheet | Evaluated by the `formulas` engine, then in Excel | ALL CHECKS reads ALL PASS; anchors matching 41 of 41; invariants I1 to I9 PASS; 10 error scans at 0. I opened the workbook in Excel: no errors, ALL PASS |
+| WorkedExample | Engine | 29 of 29 rows match (cases A to E, including the tie, the "weak" test 1 text and test 2 "Met") |
+| Calculation logic | Independent Python re-implementation from the scratch CSVs and this spec's literal market-basket values | 217 outputs, 0 mismatches |
+| Inputs | Every `Inputs` value against this spec's tables and values, including `MB_GROSS` | 158 comparisons, 0 differences |
+| Names | Explicit list from this spec | 87 names, all absolute: the 82 in this spec plus the 5 approved extras; none missing, none extra |
+| Typed values and fill | Script | Typed numbers only on `Inputs` and the `WorkedExample` inputs; every input yellow; no formula yellow |
+| Clipped text | Script estimate | 0 |
+| Owner's manual audit | Simulated in the engine on copies of the workbook, one step at a time | Every step as specified, with ALL CHECKS at ALL PASS throughout: step 1, excess days 7,287 (2023) and 0 (2024), capacity ratios blank, 10 anchors FAIL; step 2, "Not falsified", 41 of 41 anchors; step 3, 2023 a tie, `T3_YEARS` 5, `T1_DROP_2024` -11.84 points, `T1_OTHER_CHANGE_2024` -39, 3 anchors FAIL; step 4, `NET_COST_LO(2024)` 0, `EXCESS_COST_LO(2024)` 0, `NET_COST_LO_NOW` -26.48, 4 anchors FAIL. My own run in Excel is still to do |
+
+**What was found**
+
+- New outputs from the draft inputs: `CAP_RATIO(2024)` 11.69 and `CAP_RATIO_STAFF_2024` 7.53; test 1 on counts +13 and +32 (2020 to 2021), +15 and -33 (2023 to 2024); `RATE_GROWTH_2024_2026` 1.38% a year; `COST_FWD` $506.07 (FY2026) and $522.77 (FY2027); `COND_A_GAP` 2.14% and 3.95%. Verdicts unchanged: test 1 "Falsified", test 2 "Not met", test 3 "Met".
+- No calculation error found. The formulas engine treats a name that refers to its own range as circular, so `COST_FWD` multiplies the FY2023 base by the market-basket factors directly, and `RATE_FWD(2027)` looks up the January 2026 rate directly; the values are the same as a year-to-year chain.
+
+**What was done, and build conventions not stated above**
+
+- Verification columns sit in columns P to R of `Inputs` on every input row (58 rows), past the widest table, so the long source text stays readable; the count is at the top of `Inputs`.
+- Anchor results read FAIL, not an error, when a value is blank (for example the capacity ratios in manual-audit step 1), so a blank never trips an error scan.
+- The figures were not rebuilt: `FigureData` is unchanged, and its figure c rate slots were re-checked (0 mismatches).
+- Build and check scripts, extended, are in my Research Paper folder (`model-build-scripts-v2`, with `manual_audit.py`).
