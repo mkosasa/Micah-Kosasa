@@ -5,7 +5,8 @@ analyzing its implications, and recommending a policy or strategy defended
 against objections.
 
 **Exercised in:** research paper (`docs/briefs/research-brief.md`,
-`capabilities/economic-research/spec.md`, `analysis/research-paper.pdf`)
+`capabilities/economic-research/spec.md`, `drafts/`,
+`analysis/research-paper.pdf`)
 
 ## Files
 
@@ -29,4 +30,4 @@ kept under `analysis/` to match this repo's layout). Dated drafts live in
 
 | Engagement | Brief | Status |
 |---|---|---|
-| research-paper | `docs/briefs/research-brief.md` | First brief committed 2026-09-28, superseded 2026-09-29 by a problem-first brief at the same path (status committed); spec rewritten 2026-09-28 for the new brief; model (`model.xlsx`) and figures a, b, c, d, g (`analysis/figures/`) built 2026-09-29, spec `status: built`; model rebuilt 2026-09-29 for the lean audit changes (anchors, invariants and error scans; WorkedExample; capacity ratio; test 1 on counts; condition (a)); verification of values, my manual-audit run and review of figure captions pending |
+| research-paper | `docs/briefs/research-brief.md` | First brief committed 2026-09-28, superseded 2026-09-29 by a problem-first brief at the same path (status committed); spec rewritten 2026-09-28 for the new brief; model (`model.xlsx`) and figures a, b, c, d, g (`analysis/figures/`) built 2026-09-29, spec `status: built`; model rebuilt 2026-09-29 for the lean audit changes (anchors, invariants and error scans; WorkedExample; capacity ratio; test 1 on counts; condition (a)); verification of values, my manual-audit run and review of figure captions pending; first draft of the paper committed 2026-09-30 (`drafts/2026-09-29-draft.md`) |
