@@ -318,6 +318,8 @@ Built from `FigureData` into `analysis/figures/` (PNG). File names `fig-a-days-p
 | d | `WL_DAYS` by year, 2017 to 2024, as stacked bars: `WITHIN_DAYS` and `EXCESS_DAYS`. |
 | g | Schematic, no dollar values: one bed's year as one long Medicaid stay, against the same bed turning over a run of short Medicare stays. The caption states that test 1 did not support this mechanism. |
 
+In the paper, figures a, c and b are Figure 1, Figure 2 and Figure 3, in order of first mention, and their captions carry those numbers. Figure b's caption also says that "No bed" has not been the largest reason since 2021. Figures d and g are not used in the paper and keep their letters. File names are unchanged.
+
 ## Success criteria
 
 A finished paper:
@@ -418,3 +420,12 @@ Rebuild by Claude Code after I approved two new outputs, `CEIL_PER_PT_LO` and `C
 | Owner's manual audit | Simulated in the engine | ALL CHECKS at ALL PASS in every step; step 4 now also fails the `CEIL_PER_PT_LO` anchor (5 anchors FAIL) |
 
 New outputs from the current inputs: `CEIL_PER_PT_LO` $1,232.72 and `CEIL_PER_PT_HI` $19,166.10 per placed patient. Verdicts unchanged: test 1 "Falsified", test 2 "Not met", test 3 "Met". The figures were not rebuilt (`FigureData` is unchanged). The clipped-text estimate flags 40 cells in column P of `Inputs`: my typed source-page entries are longer than the column, as on main.
+
+### Figure numbers (2026-09-30)
+
+Rebuild of figures a, b and c by Claude Code with the paper's numbers in their captions (Figure 1, Figure 3 and Figure 2) and the added phrase in figure b's caption. Branch `research-figure-numbers`, from main at `a67dd3e`. `FigureData` and the charts themselves are unchanged; only caption text changed.
+
+| Check | Method | Result |
+|---|---|---|
+| Match with the paper | SHA-256 of each rebuilt file against the chart embedded in my Word draft v3 | `fig-a-days-per-patient.png`, `fig-c-cost-vs-rate.png` and `fig-b-reason-shares.png` are byte-identical to the draft's Figure 1, 2 and 3 |
+| Unused figures | SHA-256 before and after the rebuild | `fig-d-excess-days.png` and `fig-g-opportunity-cost.png` unchanged |
