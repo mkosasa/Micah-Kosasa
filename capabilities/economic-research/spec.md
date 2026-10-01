@@ -114,7 +114,7 @@ One workbook, `capabilities/economic-research/model.xlsx`, replacing the old one
 |---|---|
 | `Inputs` | Every input above, yellow; scalar inputs in a Name, Value, Unit, Source table; year-indexed inputs in one year table; county, rate and cost series in their own tables |
 | `Waitlist` | Year table 2017 to 2024: days per patient, benchmark days, excess days, beds, reason shares, flags |
-| `Cost` | 2023, 2024 and the current case: average waitlisted rate, net cost per day (low, high), cost of excess days |
+| `Cost` | 2023, 2024 and the current case: average waitlisted rate, net cost per day (low, high), cost of excess days; the offer ceiling per placed patient |
 | `Tests` | The three tests, each with its inputs, result and verdict; then a side diagnostic (test 1 on counts) that changes no verdict |
 | `County` | Days per patient and share of days by county, 2023 and 2024 |
 | `Capacity` | Excess beds against unstaffed long-term-care beds, 2017 to 2024: a scale comparison, not a sizing |
@@ -148,6 +148,7 @@ One workbook, `capabilities/economic-research/model.xlsx`, replacing the old one
 - `NET_COST_LO(y) = AVOID_COST_LO - WL_RATE_AVG(y)`; `NET_COST_HI(y) = AVOID_COST_HI - WL_RATE_AVG(y)`
 - `EXCESS_COST_LO(y) = EXCESS_DAYS(y) * NET_COST_LO(y)`; `EXCESS_COST_HI(y) = EXCESS_DAYS(y) * NET_COST_HI(y)`
 - Current case: `NET_COST_LO_NOW = AVOID_COST_LO - WL_RATE_2026`, `NET_COST_HI_NOW = AVOID_COST_HI - WL_RATE_2026`; `EXCESS_COST_LO_NOW` and `EXCESS_COST_HI_NOW` value `EXCESS_DAYS(2024)` at those net costs
+- Offer ceiling per placed patient: `CEIL_PER_PT_LO = NET_COST_LO_NOW * DAYS_PER_PT(2024)`; `CEIL_PER_PT_HI = NET_COST_HI_NOW * DAYS_PER_PT(2024)`, the most a hospital gains from placing one waitlisted patient, at the 2024 average wait and the current waitlisted rate
 
 ### County (2023, 2024)
 
@@ -203,6 +204,7 @@ One workbook, `capabilities/economic-research/model.xlsx`, replacing the old one
 - **Verdicts only.** The model reports each test's verdict. It does not rank or cost the options and does not choose between the add-on and the top-up.
 - **Capacity comparison.** The `Capacity` sheet compares scale; it does not size or cost an option. Three limits go beside it: (1) excess beds cover the acute waitlist across all levels of care on an average day, while unstaffed beds are long-term-care beds on Dec 31, so this is not a bed-for-bed match; (2) reopening beds idle for lack of staff is a workforce lever outside my scope, while my capacity option is new transitional capacity; (3) excess days are a lower bound, so excess beds are too.
 - **Condition (a).** Cost is carried forward at the gross CMS SNF market basket, a national Medicare index standing in for Hawaii nursing-home cost growth, and the rate at its 2024 to 2026 pace. The gap is 1 - rate / cost. Cost is dated July 1 of the fiscal year and the rate January, a half-year mismatch. The condition describes what the model computes under stated assumptions; it is not a forecast, and the model does not rank or cost the options.
+- **Offer ceiling.** `CEIL_PER_PT_LO` and `CEIL_PER_PT_HI` describe the ceiling of an offer per placed patient. They are not a test and change no verdict. I chose them on Sep 30, after the results were known. Displayed to cents.
 - **Dates on figure c.** Each fiscal year's cost is plotted at July 1 of that year; each rate at its memo's effective month. Cost lines stop at 2023; the rate line runs to 2026.
 - **Cost-report periods.** Each CMS fiscal-year file holds 12-month reports whose periods vary by facility; in every year from FY2011 to FY2023, 5 to 8 reports run into the following calendar year. In FY2023, six reports (857 beds) run past the January 2024 reset. The model uses each file as published.
 - **Precision.** No rounding inside calculations. Input medians (rate and cost) are taken on unrounded values and rounded half up to the cent. Display days per patient to 1 decimal, shares to 0.1 point, beds to 1 decimal, dollars per day to cents, totals to whole dollars.
@@ -221,7 +223,7 @@ Structural:
 
 The `Checks` sheet has three groups.
 
-**Regression anchors.** The hand checks below, each against a fixed expected value from the draft inputs. They are expected to change when I correct an input during verification; after a correction I re-derive the expected value. They are not part of ALL CHECKS. A cell shows "Anchors matching: n of 41."
+**Regression anchors.** The hand checks below, each against a fixed expected value from the draft inputs. They are expected to change when I correct an input during verification; after a correction I re-derive the expected value. They are not part of ALL CHECKS. A cell shows "Anchors matching: n of 43."
 
 **Invariants.** These must pass for any inputs. One row each; a row that covers years passes only if it holds in every year.
 
@@ -254,6 +256,7 @@ Hand checks (regression anchors, from the draft inputs; expected to change when 
 | `NET_COST_LO(2024)`, `NET_COST_HI(2024)` | 89.72, 1,009.72 |
 | `EXCESS_COST_LO(2024)`, `EXCESS_COST_HI(2024)` | about 1,539,057; about 17,320,737 |
 | `NET_COST_LO_NOW`, `NET_COST_HI_NOW` | 63.24, 983.24 |
+| `CEIL_PER_PT_LO`, `CEIL_PER_PT_HI` | 1,232.72; 19,166.10 |
 | `WL_DAYS_CHANGE_2024` | -26.7% |
 | `T1_DROP_2021`, `T1_DROP_2024` | -1.92 points, -11.12 points (both rises; unrounded, the 2021 rise is 1.9 points; see Errors caught, 2026-09-28) |
 | `T2_SLOPE` | about +1.88 days per patient per year |
@@ -268,7 +271,7 @@ Hand checks (regression anchors, from the draft inputs; expected to change when 
 | `COST_FWD(2026)`, `COST_FWD(2027)` | $506.08; $522.78 |
 | `COND_A_GAP(2026)`, `COND_A_GAP(2027)` | 2.14%; 3.95% |
 
-(The table's current rows become 30 anchor rows on the `Checks` sheet; the two county-sum rows move to invariant I4. The new rows add 11 anchors, one per value: 41 in all.)
+(The table's current rows become 30 anchor rows on the `Checks` sheet; the two county-sum rows move to invariant I4. The new rows add 11 anchors, one per value: 41 in all. The offer-ceiling row adds 2: 43 in all.)
 
 **WorkedExample anchor.** The `WorkedExample` sheet has its own yellow inputs (not linked to `Inputs`), including its own benchmark (14) and test 1 threshold (5 points). Each case runs through the same formula shapes as the model and compares every result with the expected value below.
 
@@ -295,6 +298,7 @@ Case E feeds the drops straight into the verdict formula; the share-to-drop step
 
 - By year, 2017 to 2024: `DAYS_PER_PT`, `GAP_PER_PT`, `WL_DAYS`, `EXCESS_DAYS`, `EXCESS_SHARE`, `EXCESS_BEDS`, `MEETS_BENCH`, the seven `SHARE_` values, `LTC_UNSTAFFED`, COVID flag.
 - 2023, 2024 and now: `WL_RATE_AVG`, `NET_COST_LO/HI`, `EXCESS_COST_LO/HI` (and the `_NOW` versions); `NF_SHARE_DEC31`; `WL_DAYS_CHANGE_2024`.
+- Offer ceiling: `CEIL_PER_PT_LO`, `CEIL_PER_PT_HI`.
 - County row: `CTY_DAYS_PER_PT(c,y)` and `CTY_DAY_SHARE(c,y)`, 2023 and 2024.
 - Tests: `T1_DROP_2021`, `T1_DROP_2024`, `T1_VERDICT`; `T2_SLOPE`, `T2_VERDICT`; `LARGEST_REASON(y)`, `T3_YEARS`, `T3_VERDICT`.
 - Staffing note: `LTC_UNSTAFFED(2024)` and `LTC_UNSTAFFED_STAFF_2024`.
@@ -399,3 +403,18 @@ Rebuild by Claude Code after a model audit (findings kept outside the repo) and 
 ### Input verification (2026-09-29)
 
 I verified the inputs against their primary sources, with Claude Code finding and opening each source and re-deriving derived values. Four values were wrong by one cent and are corrected: the January 2026 rate median (495.25 to 495.26; the median 495.255 had been rounded down) and three cost medians (FY2014 all facilities 344.18 to 344.19, FY2015 Medicaid-heavy 322.11 to 322.10, FY2023 Medicaid-heavy 461.78 to 461.79; the build had taken medians of values already rounded to the cent). The `COST_FWD` anchors moved to $506.08 and $522.78. No test, definition or verdict changed. My verification entries are on `Inputs`, columns P to R.
+
+### Offer ceiling build (2026-09-30)
+
+Rebuild by Claude Code after I approved two new outputs, `CEIL_PER_PT_LO` and `CEIL_PER_PT_HI`, on the `Cost` sheet. Branch `research-offer-ceiling`, from main at `efb1c77`. No input, test, definition or verdict changed.
+
+| Check | Method | Result |
+|---|---|---|
+| Checks sheet | Evaluated by the `formulas` engine | ALL CHECKS reads ALL PASS; anchors matching 43 of 43; 62 rows PASS, 0 FAIL. My own Excel check is still to do |
+| Calculation logic | Independent Python re-implementation from the scratch CSVs | 219 outputs, 0 mismatches |
+| Inputs | Every `Inputs` value against this spec's tables and values | 158 comparisons, 0 differences |
+| Names | Explicit list from this spec | 89 names, all absolute: the 84 in this spec plus the 5 approved extras; none missing, none extra |
+| Verification entries | Columns P to R of `Inputs` carried from the workbook on main into the rebuild; columns A to O compared cell by cell | 173 cells on 58 rows carried; 0 differences in A to O; the count reads 57 of 58 |
+| Owner's manual audit | Simulated in the engine | ALL CHECKS at ALL PASS in every step; step 4 now also fails the `CEIL_PER_PT_LO` anchor (5 anchors FAIL) |
+
+New outputs from the current inputs: `CEIL_PER_PT_LO` $1,232.72 and `CEIL_PER_PT_HI` $19,166.10 per placed patient. Verdicts unchanged: test 1 "Falsified", test 2 "Not met", test 3 "Met". The figures were not rebuilt (`FigureData` is unchanged). The clipped-text estimate flags 40 cells in column P of `Inputs`: my typed source-page entries are longer than the column, as on main.
