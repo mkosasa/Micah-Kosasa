@@ -24,7 +24,7 @@ The problem also falls on hospitals, which carry each waitlisted day at an avoid
 
 Where hospitals run full, the problem also falls on acute patients who can't get a bed. The HCR 161 report notes that waitlisted patients "at times" push emergency departments onto diversion. I make this claim only for hospitals that run full, because the evidence is weak: SHPDA's occupancy figure is an annual average of licensed beds, and it includes the waitlisted patients themselves.
 
-It matters now for two reasons: it isn't clear the 2024 improvement will last, and even with it the status quo is unacceptable. Waitlist days fell 27% in 2024, the first year under the January 2024 rate reset, but the average stayed above 14. The rate history is why I don't count on the improvement holding. The trouble is that the median rate sat 19 to 29% below the median cost of Medicaid-heavy homes for years. A 12% adjustment for private homes (effective January 2021, first seen in the July 2021 rate memo) narrowed the gap, and only the January 2024 reset roughly closed it against the latest cost year, 2023. Since 2024 the method is again index-only, with no scheduled rebase. The median rate has gone from $481.83 at the reset to $495.25 now, about 1.4% a year, and that includes an unexplained drop in January 2026. The population is also aging, which should add demand, though I haven't pulled DBEDT's projections.
+It matters now for two reasons: it isn't clear the 2024 improvement will last, and even with it the status quo is unacceptable. Waitlist days fell 27% in 2024, the first year under the January 2024 rate reset, but the average stayed above 14. The rate history is why I don't count on the improvement holding. The trouble is that the median rate sat 19 to 29% below the median cost of Medicaid-heavy homes for years. A 12% adjustment for private homes (effective January 2021, first seen in the July 2021 rate memo) narrowed the gap, and only the January 2024 reset roughly closed it against the latest cost year, 2023. Since 2024 the method is again index-only, with no scheduled rebase. The median rate has gone from $481.83 at the reset to $495.26 now, about 1.4% a year, and that includes an unexplained drop in January 2026. The population is also aging, which should add demand, though I haven't pulled DBEDT's projections.
 
 **What is fixed** (from the data gathered so far):
 
@@ -107,3 +107,7 @@ After a fact check of this brief, I corrected facts and wording without changing
 - Test 3's window reads 2017 to 2024, the years SHPDA's waitlist table covers; the earlier "2015 to 2024" contradicted its own note that the data starts in 2017.
 - The 543-day figure is described as the median of Hawaii homes' average Medicaid stays, from CMS cost reports.
 - The frontmatter names the brief this one supersedes.
+
+## Correction (2026-09-30)
+
+- The January 2026 median rate reads $495.26, not $495.25. Input verification (2026-09-29) found the exact median of the memo's 36 rates is 495.255, which rounds to 495.26; the spec and the model were corrected then. The "about 1.4% a year" figure is unchanged.

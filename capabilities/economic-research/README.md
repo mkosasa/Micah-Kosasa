@@ -16,10 +16,11 @@ against objections.
   audit build. The spec for the superseded brief is in the repository
   history.
 - `model.xlsx`: the model built 2026-09-29 from `spec.md` and rebuilt the
-  same day for the lean audit changes (sheets Inputs, Waitlist, Cost,
+  same day for the lean audit changes, then for four input medians
+  corrected in input verification (sheets Inputs, Waitlist, Cost,
   Tests, County, Capacity, Conditions, FigureData, WorkedExample, Checks).
-  Values are drafts until I verify them against their sources; the
-  verification columns on Inputs track that.
+  The verification columns on Inputs record my check of each value
+  against its source (57 of 58 rows dated 2026-09-29).
 - `README.md`: this file.
 
 Figures live in `analysis/figures/` (the assignment page names `figures/`;
@@ -30,4 +31,4 @@ kept under `analysis/` to match this repo's layout). Dated drafts live in
 
 | Engagement | Brief | Status |
 |---|---|---|
-| research-paper | `docs/briefs/research-brief.md` | First brief committed 2026-09-28, superseded 2026-09-29 by a problem-first brief at the same path (status committed); spec rewritten 2026-09-28 for the new brief; model (`model.xlsx`) and figures a, b, c, d, g (`analysis/figures/`) built 2026-09-29, spec `status: built`; model rebuilt 2026-09-29 for the lean audit changes (anchors, invariants and error scans; WorkedExample; capacity ratio; test 1 on counts; condition (a)); verification of values, my manual-audit run and review of figure captions pending; first draft of the paper committed 2026-09-30 (`drafts/2026-09-29-draft.md`) |
+| research-paper | `docs/briefs/research-brief.md` | First brief committed 2026-09-28, superseded 2026-09-29 by a problem-first brief at the same path (status committed); spec rewritten 2026-09-28 for the new brief; model (`model.xlsx`) and figures a, b, c, d, g (`analysis/figures/`) built 2026-09-29, spec `status: built`; model rebuilt 2026-09-29 for the lean audit changes (anchors, invariants and error scans; WorkedExample; capacity ratio; test 1 on counts; condition (a)); model and figure c rebuilt 2026-09-29 for four input medians corrected in input verification; 57 of 58 Inputs rows verified against their sources 2026-09-29; my manual-audit run and review of figure captions pending; first draft of the paper committed 2026-09-30 (`drafts/2026-09-29-draft.md`) |
