@@ -460,7 +460,7 @@ Rebuild by Claude Code after my instructor's review (PR #85, items 2 and 3) and 
 
 | Check | Method | Result |
 |---|---|---|
-| Checks sheet | Evaluated by the `formulas` engine | ALL CHECKS reads ALL PASS; anchors matching 50 of 50; 69 rows PASS, 0 FAIL. My own Excel check is still to do |
+| Checks sheet | Evaluated by the `formulas` engine | ALL CHECKS reads ALL PASS; anchors matching 50 of 50; 69 rows PASS, 0 FAIL. I opened the workbook in Excel on 2026-10-01 and it checked out |
 | Calculation logic | Independent Python re-implementation from the scratch CSVs and this spec's literal values | 234 outputs, 0 mismatches |
 | Inputs | Every `Inputs` value against this spec's tables and values | 160 comparisons, 0 differences |
 | Names | Explicit list from this spec | 99 names, all absolute: the 94 in this spec plus the 5 approved extras; none missing, none extra |
