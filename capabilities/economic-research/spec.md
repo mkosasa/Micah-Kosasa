@@ -468,3 +468,7 @@ Rebuild by Claude Code after my instructor's review (PR #85, items 2 and 3) and 
 | `MEDIAN_MCD_LOS` | Re-derived by Claude Code on 2026-10-01 from the CMS FY2023 file on data.cms.gov (37 Hawaii rows, 34 homes, each home's latest report) | Median 542.83 days over the 31 homes reporting a value (the Avalon Care Center report); range 8.26 to 1,680.75; 3 homes blank |
 
 New outputs from the current inputs: `DAYS_SAVED_PER_PT` 5.49 days; `CEIL_PER_PT_LO` $347.36 and `CEIL_PER_PT_HI` $5,400.74 per placed patient (they were $1,232.72 and $19,166.10 on the full average wait); `STAY_SHORTFALL` $5,873.50; `RATE_RISE_2021` 18.3% and `RATE_RISE_2024` 29.5%; `RATE_COST_GAP` from 19.45% (FY2023) to 28.96% (FY2020); `BEH_GUARD_SHARE_2024` 34.7%. Verdicts unchanged: test 1 "Falsified", test 2 "Not met", test 3 "Met". The figures were not rebuilt (`FigureData` is unchanged).
+
+### Verification of the two new inputs (2026-10-01)
+
+I verified `ADMIT_WINDOW_DAYS` and `MEDIAN_MCD_LOS` and typed my entries in columns P to R of `Inputs` in Excel. Claude Code compared my saved workbook with the one on main cell by cell: the six verification cells are the only changes of substance (Excel also rewrote `1e-06` as `0.000001` and `5873.50` as `5873.5` in twelve `Checks` cells and dropped the quote marks around sheet names in the defined names). Evaluated by the `formulas` engine: ALL CHECKS reads ALL PASS; anchors matching 50 of 50; 69 rows PASS, 0 FAIL; the verification count reads 59 of 60 (the July 2019 rate median is blank by my decision).
