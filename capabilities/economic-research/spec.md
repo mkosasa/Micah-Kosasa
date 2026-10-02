@@ -335,6 +335,8 @@ A finished paper:
 9. Uses only numbers verified against their primary source, with one error caught logged.
 10. Meets the format: at most 4 pages, Times New Roman 12, double-spaced, 1-inch margins, one citation style, no repository URL, identifying information only on the title page.
 
+**Note (2026-10-01).** The paper's recommendation departs from test 3's verdict (Met), so criterion 5 is not met as written. The departure and my reason are stated in the paper and recorded in the brief's Correction of 2026-10-01. No test, definition or verdict changed.
+
 ## Audit findings
 
 Build of 2026-09-29, by Claude Code from this spec (main at `3641f5d`), on branch `research-model-build`. Every value is still a draft until I verify it against its source (the SHPDA counts, the OCR rate medians, the 2017 reason totals, the Medicaid-heavy rule, $3,664, the 543 days, the CAH share).
