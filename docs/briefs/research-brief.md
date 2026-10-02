@@ -111,3 +111,11 @@ After a fact check of this brief, I corrected facts and wording without changing
 ## Correction (2026-09-30)
 
 - The January 2026 median rate reads $495.26, not $495.25. Input verification (2026-09-29) found the exact median of the memo's 36 rates is 495.255, which rounds to 495.26; the spec and the model were corrected then. The "about 1.4% a year" figure is unchanged.
+
+## Correction (2026-10-01)
+
+My recommendation departs from test 3's verdict. By the rule I set in advance, capacity won, but the pass rests on 2017 to 2021, when the benchmark was met in four years of five, and "no bed" has not been the largest reason in any year since, the years the wait ran longest. I made that judgment after seeing the result, so I state it as a departure from the test, not as what the test showed.
+
+Instead of recommending new transitional capacity first, the paper recommends that hospitals first offer homes a capped payment for guaranteed admission, and turn to capacity only if homes do not commit beds. The offer is recommended as a test of a conditional payment, which the two unconditional increases never tried; it does not rest on the opportunity-cost hypothesis, which test 1 falsified.
+
+The three tests, their definitions and their verdicts are unchanged. Test 3 still reads Met.
