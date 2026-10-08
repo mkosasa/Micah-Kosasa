@@ -141,6 +141,7 @@ One workbook, `capabilities/economic-research/model.xlsx`, replacing the old one
 - `REASON_SUM(y)` = the sum of the seven `REASON_` inputs
 - `SHARE_<reason>(y) = REASON_<reason>(y) / REASON_SUM(y)`, for each of the seven reasons
 - `NF_SHARE_DEC31(y) = DEC31_NF(y) / DEC31_TOTAL(y)`, 2023 and 2024, reported beside the result only
+- `NF_BAR_BEDS = EXCESS_BEDS(2024) * NF_SHARE_DEC31(2024)`, the nursing-facility share of the 2024 excess beds: the number of committed beds that counts as "yes" in the six-month offer test
 - `WL_DAYS_CHANGE_2024 = WL_DAYS(2024) / WL_DAYS(2023) - 1`
 - `FLAG_2017_INCOMPLETE` = TRUE when `REASON_SUM(2017) < DEC31_TOTAL(2017)`
 
@@ -205,7 +206,7 @@ Numbers the paper states that are computed from the inputs, so each has a cell.
 ## Conventions
 
 - **Definitions set after results.** I locked the three tests on Sep 28, before pulling the 2017 to 2022 data. I set the definitions below on Sep 28, after I had seen the results. The paper says so.
-- **Which days count.** The gap and its cost cover the whole acute waitlist, all levels of care, because the yearly figures aren't split by level. The Dec 31 nursing-facility shares (82% in 2023, 69% in 2024) are reported beside the result, not used to scale it.
+- **Which days count.** The gap and its cost cover the whole acute waitlist, all levels of care, because the yearly figures aren't split by level. The Dec 31 nursing-facility shares (82% in 2023, 69% in 2024) are reported beside the result and are not used to scale the gap or its cost. One exception, added 2026-10-07: the 2024 share sets the six-month bar (`NF_BAR_BEDS`).
 - **Excess days are a lower bound.** Excess days are measured against the average benchmark (total days minus patients x 14, floored at 0), not patient by patient. Because some patients wait beyond 14 days even in a year whose average is under 14, they are a lower bound on the days patients spent beyond 14, and the paper does not describe them as days patients waited beyond two weeks. `GAP_PER_PT` shows each year's signed margin.
 - **Days in the year.** Calendar days: 366 in 2020 and 2024.
 - **Reason shares.** The denominator is the sum of the seven recorded reasons (`REASON_SUM`), not the Dec 31 total by level of care. For 2017 that is 120, not 157.
@@ -219,6 +220,7 @@ Numbers the paper states that are computed from the inputs, so each has a cell.
 - **Capacity comparison.** The `Capacity` sheet compares scale; it does not size or cost an option. Three limits go beside it: (1) excess beds cover the acute waitlist across all levels of care on an average day, while unstaffed beds are long-term-care beds on Dec 31, so this is not a bed-for-bed match; (2) reopening beds idle for lack of staff is a workforce lever outside my scope, while my capacity option is new transitional capacity; (3) excess days are a lower bound, so excess beds are too.
 - **Condition (a).** Cost is carried forward at the gross CMS SNF market basket, a national Medicare index standing in for Hawaii nursing-home cost growth, and the rate at its 2024 to 2026 pace. The gap is 1 - rate / cost. Cost is dated July 1 of the fiscal year and the rate January, a half-year mismatch. The condition describes what the model computes under stated assumptions; it is not a forecast, and the model does not rank or cost the options.
 - **Offer ceiling.** `CEIL_PER_PT_LO` and `CEIL_PER_PT_HI` describe the ceiling of an offer per placed patient. They are not a test and change no verdict. I chose them on Sep 30, after the results were known, and on Oct 1 restated them on the days a hospital saves under the guarantee: the 2024 average wait minus `ADMIT_WINDOW_DAYS`, a 14-day window that is my judgment. The average hides patients who wait much longer. Displayed to cents.
+- **Six-month bar.** `NF_BAR_BEDS` is the bar for the offer, because the offer is made to nursing homes and can move only patients waiting for nursing-facility care. It is not a test and changes no verdict. I chose it on Oct 7, after the results were known, in answer to my instructor's review of Oct 5. It replaces the whole-gap bar of about 47 beds used in the drafts of Sep 30 and Oct 1. Three limits go beside it: the share is a one-day count (the 2023 share was 82%); it is a share of patients on Dec 31, used as a share of days; and excess beds are a lower bound that assumes full occupancy. Displayed to 1 decimal.
 - **Paper figures.** A number the paper computes, as opposed to one it quotes from an outside source, is calculated in the model. The rate-cost gap pairs each fiscal year's Medicaid-heavy cost with that July's rate memo; the rate median covers all homes. Medicare's 1.2% and 4.2% are quoted from CMS, and the six-month window is my judgment; neither is a model cell.
 - **Stay shortfall.** `STAY_SHORTFALL` is a rough comparison, not a finding: it sets the cost of Medicaid-heavy homes against the rate for all homes, over the median of homes' average Medicaid stays.
 - **Dates on figure c.** Each fiscal year's cost is plotted at July 1 of that year; each rate at its memo's effective month. Cost lines stop at 2023; the rate line runs to 2026.
@@ -239,7 +241,7 @@ Structural:
 
 The `Checks` sheet has three groups.
 
-**Regression anchors.** The hand checks below, each against a fixed expected value from the draft inputs. They are expected to change when I correct an input during verification; after a correction I re-derive the expected value. They are not part of ALL CHECKS. A cell shows "Anchors matching: n of 50."
+**Regression anchors.** The hand checks below, each against a fixed expected value from the draft inputs. They are expected to change when I correct an input during verification; after a correction I re-derive the expected value. They are not part of ALL CHECKS. A cell shows "Anchors matching: n of 51."
 
 **Invariants.** These must pass for any inputs. One row each; a row that covers years passes only if it holds in every year.
 
@@ -278,6 +280,7 @@ Hand checks (regression anchors, from the draft inputs; expected to change when 
 | `RATE_RISE_2021`, `RATE_RISE_2024` | 18.3%; 29.5% |
 | `RATE_COST_GAP_MIN`, `RATE_COST_GAP_MAX` | 19.45% (FY2023); 28.96% (FY2020) |
 | `BEH_GUARD_SHARE_2024` | 34.7% (60 of 173) |
+| `NF_BAR_BEDS` | 32.5 (46.87 x 120 / 173) |
 | `WL_DAYS_CHANGE_2024` | -26.7% |
 | `T1_DROP_2021`, `T1_DROP_2024` | -1.92 points, -11.12 points (both rises; unrounded, the 2021 rise is 1.9 points; see Errors caught, 2026-09-28) |
 | `T2_SLOPE` | about +1.88 days per patient per year |
@@ -292,7 +295,7 @@ Hand checks (regression anchors, from the draft inputs; expected to change when 
 | `COST_FWD(2026)`, `COST_FWD(2027)` | $506.08; $522.78 |
 | `COND_A_GAP(2026)`, `COND_A_GAP(2027)` | 2.14%; 3.95% |
 
-(The table's current rows become 30 anchor rows on the `Checks` sheet; the two county-sum rows move to invariant I4. The new rows add 11 anchors, one per value: 41 in all. The offer-ceiling row adds 2: 43 in all. The days-saved and stay-shortfall rows add 2: 45 in all. The paper-figure rows add 5: 50 in all.)
+(The table's current rows become 30 anchor rows on the `Checks` sheet; the two county-sum rows move to invariant I4. The new rows add 11 anchors, one per value: 41 in all. The offer-ceiling row adds 2: 43 in all. The days-saved and stay-shortfall rows add 2: 45 in all. The paper-figure rows add 5: 50 in all. The six-month bar row adds 1: 51 in all.)
 
 **WorkedExample anchor.** The `WorkedExample` sheet has its own yellow inputs (not linked to `Inputs`), including its own benchmark (14) and test 1 threshold (5 points). Each case runs through the same formula shapes as the model and compares every result with the expected value below.
 
@@ -320,6 +323,7 @@ Case E feeds the drops straight into the verdict formula; the share-to-drop step
 - By year, 2017 to 2024: `DAYS_PER_PT`, `GAP_PER_PT`, `WL_DAYS`, `EXCESS_DAYS`, `EXCESS_SHARE`, `EXCESS_BEDS`, `MEETS_BENCH`, the seven `SHARE_` values, `LTC_UNSTAFFED`, COVID flag.
 - 2023, 2024 and now: `WL_RATE_AVG`, `NET_COST_LO/HI`, `EXCESS_COST_LO/HI` (and the `_NOW` versions); `NF_SHARE_DEC31`; `WL_DAYS_CHANGE_2024`.
 - Offer ceiling: `DAYS_SAVED_PER_PT`, `CEIL_PER_PT_LO`, `CEIL_PER_PT_HI`.
+- Six-month bar: `NF_BAR_BEDS`.
 - County row: `CTY_DAYS_PER_PT(c,y)` and `CTY_DAY_SHARE(c,y)`, 2023 and 2024.
 - Tests: `T1_DROP_2021`, `T1_DROP_2024`, `T1_VERDICT`; `T2_SLOPE`, `T2_VERDICT`; `LARGEST_REASON(y)`, `T3_YEARS`, `T3_VERDICT`.
 - Staffing note: `LTC_UNSTAFFED(2024)` and `LTC_UNSTAFFED_STAFF_2024`.
@@ -472,3 +476,20 @@ New outputs from the current inputs: `DAYS_SAVED_PER_PT` 5.49 days; `CEIL_PER_PT
 ### Verification of the two new inputs (2026-10-01)
 
 I verified `ADMIT_WINDOW_DAYS` and `MEDIAN_MCD_LOS` and typed my entries in columns P to R of `Inputs` in Excel. Claude Code compared my saved workbook with the one on main cell by cell: the six verification cells are the only changes of substance (Excel also rewrote `1e-06` as `0.000001` and `5873.50` as `5873.5` in twelve `Checks` cells and dropped the quote marks around sheet names in the defined names). Evaluated by the `formulas` engine: ALL CHECKS reads ALL PASS; anchors matching 50 of 50; 69 rows PASS, 0 FAIL; the verification count reads 59 of 60 (the July 2019 rate median is blank by my decision).
+
+### Six-month bar build (2026-10-07)
+
+Rebuild by Claude Code after my instructor's review of Oct 5 (PR #90, item 2) and from the spec text I wrote. One new output, `NF_BAR_BEDS`, a formula cell in the notes block of the `Waitlist` sheet, with one new regression anchor. Branch `research-nf-bar`, from main at `f9e43e7`. No input, test, definition or verdict changed; `EXCESS_BEDS(2024)` still reads 46.9, and the gap and its cost are still not scaled by the nursing-facility share.
+
+| Check | Method | Result |
+|---|---|---|
+| Counts before the change | Read from the workbook on main | 50 anchor rows; 99 defined names (the 94 in this spec plus the 5 approved extras) |
+| Checks sheet | Evaluated by the `formulas` engine | ALL CHECKS reads ALL PASS; anchors matching 51 of 51; 70 rows PASS, 0 FAIL. I opened the workbook in Excel on 2026-10-07 and the check was good |
+| Calculation logic | Independent Python re-implementation from the scratch CSVs and this spec's literal values | 235 outputs, 0 mismatches. `NF_BAR_BEDS`: 17,154 / 366 x 120 / 173 = 32.51 |
+| Inputs | Every `Inputs` value against this spec's tables and values | 160 comparisons, 0 differences |
+| Names | Explicit list from this spec | 100 names, all absolute: the 95 in this spec plus the 5 approved extras; none missing, none extra |
+| Typed values and fill | Script | Typed numbers only on `Inputs` and the `WorkedExample` inputs; `NF_BAR_BEDS` is a formula and is not yellow |
+| Verification entries | Columns P to R of `Inputs` carried from the workbook on main, matched by each row's content | 179 cells on 60 rows carried, none unmatched; the count reads 59 of 60, as before |
+| Owner's manual audit | Simulated in the engine | ALL CHECKS at ALL PASS in every step; step 1 (`BENCH_DAYS` = 21) now also fails the `NF_BAR_BEDS` anchor (11 anchors FAIL), since 2024 has no excess beds at that benchmark |
+
+New output from the current inputs: `NF_BAR_BEDS` 32.5 beds (32.51 unrounded; about 33 in the paper). Verdicts unchanged: test 1 "Falsified", test 2 "Not met", test 3 "Met". The figures were not rebuilt (`FigureData` is unchanged). The review's item 1 (whether the patients the offer targets wait longer than average) and item 3 (the brief's named objection) are answered in the paper's text and needed no spec or model change.
