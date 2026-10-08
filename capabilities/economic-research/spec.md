@@ -484,7 +484,7 @@ Rebuild by Claude Code after my instructor's review of Oct 5 (PR #90, item 2) an
 | Check | Method | Result |
 |---|---|---|
 | Counts before the change | Read from the workbook on main | 50 anchor rows; 99 defined names (the 94 in this spec plus the 5 approved extras) |
-| Checks sheet | Evaluated by the `formulas` engine | ALL CHECKS reads ALL PASS; anchors matching 51 of 51; 70 rows PASS, 0 FAIL. My own Excel check is still to do |
+| Checks sheet | Evaluated by the `formulas` engine | ALL CHECKS reads ALL PASS; anchors matching 51 of 51; 70 rows PASS, 0 FAIL. I opened the workbook in Excel on 2026-10-07 and the check was good |
 | Calculation logic | Independent Python re-implementation from the scratch CSVs and this spec's literal values | 235 outputs, 0 mismatches. `NF_BAR_BEDS`: 17,154 / 366 x 120 / 173 = 32.51 |
 | Inputs | Every `Inputs` value against this spec's tables and values | 160 comparisons, 0 differences |
 | Names | Explicit list from this spec | 100 names, all absolute: the 95 in this spec plus the 5 approved extras; none missing, none extra |
